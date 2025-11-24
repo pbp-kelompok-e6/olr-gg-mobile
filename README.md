@@ -30,6 +30,7 @@ OLR adalah pusat komunitas dan berita olahraga umum yang dirancang untuk penyuka
 
 <h2>Alur Pengintegrasian dengan Web</h2>
 - Kita telah membuat API endpoint dalam proyek Django kemarin, sehingga untuk mengintegrasikan data dengan web cukup dengan memanggil API yang dibutuhkan saja.
+- Kita akan melakukan perubahan-perubahan kecil pada aplikasi seperti mengubah penggunaan modal menjadi berpindah halaman.
 
 <h2>Role/Peran User</h2>
 

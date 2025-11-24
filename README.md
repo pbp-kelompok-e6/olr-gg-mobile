@@ -28,6 +28,9 @@ OLR adalah pusat komunitas dan berita olahraga umum yang dirancang untuk penyuka
 - Logout
 - Reading List
 
+<h2>Alur Pengintegrasian dengan Web</h2>
+- Kita telah membuat API endpoint dalam proyek Django kemarin, sehingga untuk mengintegrasikan data dengan web cukup dengan memanggil API yang dibutuhkan saja.
+
 <h2>Role/Peran User</h2>
 
 - Admin/Moderator (bisa delete semua berita dan comment, menambahkan berita, mengangkat writer, mengurus user/writer [kick/ban] berdasarkan report)

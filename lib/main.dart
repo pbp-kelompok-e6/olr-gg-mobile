@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         return request;
       },
       child: MaterialApp(
-        title: 'Inazuma Sportswear',
+        title: 'OLR.GG',
         theme: ThemeData(
           // This is the theme of your application.
           //

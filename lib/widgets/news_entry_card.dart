@@ -5,6 +5,7 @@ import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:olrggmobile/screens/edit_news.dart';
 import 'package:olrggmobile/screens/news_entry_list.dart';
 
+
 class NewsEntryCard extends StatelessWidget {
   final NewsEntry news;
   final VoidCallback onTap;

@@ -5,6 +5,7 @@ import 'package:olrggmobile/screens/news_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/screens/login.dart';
+import 'package:olrggmobile/users/screens/profile_page.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -76,6 +77,16 @@ class LeftDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const NewsEntryListPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('My Profile'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
               );
             },
           ),

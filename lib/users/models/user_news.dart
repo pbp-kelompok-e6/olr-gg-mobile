@@ -1,7 +1,7 @@
 // lib/models/user_news.dart
 
 class UserNews {
-  final int id;
+  final String id;
   final String title;
   final String category;
   final String categoryDisplay;
@@ -23,7 +23,7 @@ class UserNews {
 
   factory UserNews.fromJson(Map<String, dynamic> json) {
     return UserNews(
-      id: json['id'],
+      id: json['id'].toString(),
       title: json['title'],
       category: json['category'],
       categoryDisplay: json['category_display'],

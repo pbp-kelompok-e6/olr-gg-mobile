@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:olrggmobile/users/models/user_profile.dart';
-import 'package:olrggmobile/widgets/left_drawer.dart'; 
+import 'package:olrggmobile/users/models/user_news.dart'; // Import model baru
+import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -12,50 +13,81 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // fungsi buat mengambil data profil
-  Future<UserProfile> fetchProfile(CookieRequest request) async {
-    // TODO: ntar ganti url 
-    final response = await request.get('http://localhost:8000/users/api/profile/');
+  // Kita gunakan FutureBuilder yang menangani kedua request (Profil & News)
+  late Future<Map<String, dynamic>> _dataFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final request = context.read<CookieRequest>();
+    _dataFuture = fetchProfileAndNews(request);
+  }
+
+  Future<Map<String, dynamic>> fetchProfileAndNews(CookieRequest request) async {
+    // 1. Ambil Profil User (Gunakan endpoint API profil yang sebelumnya sudah dibuat)
+    //    Endpoint ini tetap diperlukan untuk mendapatkan ID user yang sedang login.
+    final profileResponse = await request.get('http://localhost:8000/users/api/profile/');
     
-    if (response['status'] == 'success') {
-      return UserProfile.fromJson(response['data']);
-    } else {
-      throw Exception('Gagal memuat profil: ${response['message']}');
+    if (profileResponse['status'] != 'success') {
+      throw Exception('Gagal memuat profil');
     }
+    
+    final userProfile = UserProfile.fromJson(profileResponse['data']);
+
+    // 2. Ambil News menggunakan endpoint ASLI yang sudah dimodifikasi
+    //    Format: /users/load_news/?id=ID_USER&type=json
+    final newsResponse = await request.get(
+      'http://localhost:8000/users/load_news/?id=${userProfile.id}&type=json'
+    );
+    
+    List<UserNews> newsList = [];
+    if (newsResponse['status'] == 'success') {
+      for (var item in newsResponse['news_list']) {
+        newsList.add(UserNews.fromJson(item));
+      }
+    }
+
+    return {
+      'profile': userProfile,
+      'news': newsList,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    final request = context.watch<CookieRequest>();
-
+    // Note: Request tidak perlu di-watch di build jika sudah di-read di initState,
+    // tapi jika butuh refresh state, bisa disesuaikan.
+    
     return Scaffold(
-      backgroundColor: Colors.blue[300], 
+      backgroundColor: Colors.blue[300],
       appBar: AppBar(
         title: const Text(
           'My Profile',
           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
         ),
-        backgroundColor: Colors.yellow[700], 
+        backgroundColor: Colors.yellow[700],
         foregroundColor: Colors.black,
       ),
       drawer: const LeftDrawer(),
-      body: FutureBuilder<UserProfile>(
-        future: fetchProfile(request),
+      body: FutureBuilder<Map<String, dynamic>>(
+        future: _dataFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           } else if (!snapshot.hasData) {
-            return const Center(child: Text("Data profil tidak ditemukan"));
+            return const Center(child: Text("Data tidak ditemukan"));
           }
 
-          final user = snapshot.data!;
+          final UserProfile user = snapshot.data!['profile'];
+          final List<UserNews> newsList = snapshot.data!['news'];
 
           return SingleChildScrollView(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Profil dengan Background Kuning
+                // === BAGIAN PROFIL (Sama seperti sebelumnya) ===
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
@@ -69,27 +101,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Column(
                       children: [
-                        // Foto Profil
                         CircleAvatar(
                           radius: 60,
                           backgroundColor: Colors.white,
                           backgroundImage: NetworkImage(
-                            // Gunakan proxy URL jika di localhost android
                             'http://localhost:8000${user.profilePictureUrl}',
                           ),
                           onBackgroundImageError: (_, __) => const Icon(Icons.person),
                         ),
                         const SizedBox(height: 10),
-                        // Nama Lengkap / Username
                         Text(
                           user.fullName,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
-                        // Role Badge
                         Container(
                           margin: const EdgeInsets.only(top: 8),
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
@@ -99,10 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           child: Text(
                             user.role.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -110,11 +131,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
-
-                // Info Cards
+                // === BAGIAN INFO ===
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
                       _buildInfoCard(
@@ -122,56 +141,145 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: "Bio",
                         content: user.bio,
                       ),
-                      
                       const SizedBox(height: 10),
-
                       _buildInfoCard(
                         icon: Icons.warning_amber_rounded,
-                        title: "Account status",
-                        content: "Strike count: ${user.strikes}/3",
+                        title: "Status Pelanggaran",
+                        content: "Strikes: ${user.strikes}/3",
                         contentColor: user.strikes >= 3 ? Colors.red : Colors.black87,
-                        trailing: user.strikes > 0 
-                          ? const Icon(Icons.error, color: Colors.red) 
-                          : const Icon(Icons.check_circle, color: Colors.green),
-                      ),
-
-                      const SizedBox(height: 10),
-
-                      _buildInfoCard(
-                        icon: Icons.calendar_today,
-                        title: "Joined since",
-                        content: user.dateJoined,
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 30),
-
-                // Edit Profile Button (Optional, mengarah ke form edit)
+                // === BAGIAN DAFTAR BERITA ===
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Navigasi ke halaman edit profil (Anda perlu buat form ini)
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Fitur Edit Profil segera hadir!")),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.blue[900],
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      "Edit Profil",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
+                  child: const Text(
+                    "Berita Saya",
+                    style: TextStyle(
+                      fontSize: 20, 
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white // Supaya kontras dengan background biru
                     ),
                   ),
                 ),
+
+                if (newsList.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text(
+                        "Belum ada berita yang dipublish.",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    ),
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true, // Penting agar bisa di dalam SingleChildScrollView
+                    physics: const NeverScrollableScrollPhysics(), // Scroll ikut parent
+                    itemCount: newsList.length,
+                    itemBuilder: (context, index) {
+                      final news = newsList[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: InkWell(
+                          onTap: () {
+                            // TODO: Navigasi ke detail berita jika perlu
+                            // Navigator.push(...);
+                          },
+                          child: Row(
+                            children: [
+                              // Thumbnail Berita
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(12),
+                                  bottomLeft: Radius.circular(12),
+                                ),
+                                child: SizedBox(
+                                  width: 100,
+                                  height: 100,
+                                  child: Image.network(
+                                    // Handle URL proxy localhost
+                                    'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) => 
+                                      Container(color: Colors.grey, child: const Icon(Icons.broken_image)),
+                                  ),
+                                ),
+                              ),
+                              // Detail Berita
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        news.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Row(
+                                        children: [
+                                          Icon(Icons.calendar_today, size: 12, color: Colors.grey[600]),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            news.createdAt,
+                                            style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      // Kategori & Featured Badge
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue[100],
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                            child: Text(
+                                              news.categoryDisplay,
+                                              style: TextStyle(fontSize: 10, color: Colors.blue[800]),
+                                            ),
+                                          ),
+                                          if (news.isFeatured) ...[
+                                            const SizedBox(width: 6),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.amber[100],
+                                                borderRadius: BorderRadius.circular(4),
+                                              ),
+                                              child: Text(
+                                                "Featured",
+                                                style: TextStyle(fontSize: 10, color: Colors.amber[900]),
+                                              ),
+                                            ),
+                                          ]
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
               ],
             ),
           );
@@ -185,7 +293,6 @@ class _ProfilePageState extends State<ProfilePage> {
     required String title,
     required String content,
     Color contentColor = Colors.black87,
-    Widget? trailing,
   }) {
     return Card(
       elevation: 2,
@@ -203,12 +310,11 @@ class _ProfilePageState extends State<ProfilePage> {
         subtitle: Text(
           content,
           style: TextStyle(
-            fontSize: 16, 
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             color: contentColor,
           ),
         ),
-        trailing: trailing,
       ),
     );
   }

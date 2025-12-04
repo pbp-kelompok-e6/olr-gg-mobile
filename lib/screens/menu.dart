@@ -19,6 +19,7 @@ class MyHomePage extends StatelessWidget {
       if (role != "reader")
         ItemHomepage("My News", Icons.account_circle, Colors.green),
       ItemHomepage("Featured News", Icons.star, Colors.yellow),
+      ItemHomepage("Forum Diskusi", Icons.forum, Colors.blue),
     ];
 
     return Scaffold(

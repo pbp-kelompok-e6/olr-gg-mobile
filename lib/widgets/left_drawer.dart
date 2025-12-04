@@ -5,6 +5,8 @@ import 'package:olrggmobile/screens/news_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/screens/login.dart';
+import 'package:olrggmobile/forum/screens/forum_entry_list.dart';
+import 'package:olrggmobile/forum/screens/forumlist_form.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -13,6 +15,7 @@ class LeftDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     final role = request.jsonData["role"];
+    
     return Drawer(
       backgroundColor: Colors.yellow[400],
       child: ListView(
@@ -26,14 +29,14 @@ class LeftDrawer extends StatelessWidget {
                 Text(
                   'OLR.GG',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle( 
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.blue,
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(10)),
-                Text("Berita olahraga terbaik hanya di sini",
+                const Padding(padding: EdgeInsets.all(10)),
+                const Text("Berita olahraga terbaik hanya di sini",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 15,
@@ -47,7 +50,6 @@ class LeftDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.home_outlined),
             title: const Text('Home'),
-            // Bagian redirection ke MyHomePage
             onTap: () {
               Navigator.pushReplacement(
                   context,
@@ -56,29 +58,52 @@ class LeftDrawer extends StatelessWidget {
                   ));
             },
           ),
+          
           if (role != "reader" && request.loggedIn)
-          ListTile(
-            leading: const Icon(Icons.post_add),
-            title: const Text('Create News'),
-            // Bagian redirection ke ProductFormPage
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const NewsFormPage()),
-              );
-            },
-          ),
+            ListTile(
+              leading: const Icon(Icons.post_add),
+              title: const Text('Create News'),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NewsFormPage()),
+                );
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.store),
             title: const Text('News List'),
             onTap: () {
-              // Route to product list page
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const NewsEntryListPage()),
               );
             },
           ),
+
+          // FORUM
+          ListTile(
+            leading: const Icon(Icons.chat),
+            title: const Text('Forum Diskusi'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ForumEntryListPage()),
+              );
+            },
+          ),
+          if (request.loggedIn)
+            ListTile(
+              leading: const Icon(Icons.add_comment),
+              title: const Text('Buat Diskusi'),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ForumFormPage()),
+                );
+              },
+            ),
+
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

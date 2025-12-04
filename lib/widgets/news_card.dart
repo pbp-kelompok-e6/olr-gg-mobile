@@ -4,6 +4,7 @@ import 'package:olrggmobile/screens/news_entry_list.dart';
 import 'package:olrggmobile/screens/login.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
+import 'package:olrggmobile/forum/screens/forum_entry_list.dart';
 
 class ItemHomepage {
   final String name;
@@ -57,6 +58,15 @@ class ItemCard extends StatelessWidget {
                 builder: (context) => const NewsEntryListPage(showFeatured: true),
               ),
             );
+          } 
+          // FORUM
+          else if (item.name == "Forum Diskusi") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ForumEntryListPage(),
+                ),
+              );
           }
         },
         child: Container(

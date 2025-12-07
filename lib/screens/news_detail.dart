@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:olrggmobile/models/news_entry.dart';
+import 'package:olrggmobile/comments/screens/comments_section.dart';
+import 'package:olrggmobile/comments/screens/comment_form.dart';
 
 class NewsDetailPage extends StatelessWidget {
   final NewsEntry news;
@@ -15,6 +17,7 @@ class NewsDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final commentsSectionKey = GlobalKey<CommentsSectionState>();
     return Scaffold(
       backgroundColor: Colors.yellow.shade300,
       appBar: AppBar(
@@ -146,7 +149,13 @@ class NewsDetailPage extends StatelessWidget {
                 ],
               ),
             ),
-
+            CommentForm(
+              newsId: news.id,
+              onCommentAdded: () {
+                commentsSectionKey.currentState?.refreshComments();
+              },
+            ),
+            CommentsSection(key: commentsSectionKey, newsId: news.id)
           ],
         ),
       ),

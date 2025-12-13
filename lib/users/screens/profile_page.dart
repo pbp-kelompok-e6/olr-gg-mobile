@@ -5,6 +5,7 @@ import 'package:olrggmobile/users/models/user_profile.dart';
 import 'package:olrggmobile/models/news_entry.dart';       
 import 'package:olrggmobile/screens/news_detail.dart';       
 import 'package:olrggmobile/widgets/left_drawer.dart';       
+import 'package:olrggmobile/users/screens/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -61,7 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profil Saya'),
+        title: const Text('My Profile'),
       ),
       drawer: const LeftDrawer(),
       body: FutureBuilder<Map<String, dynamic>>(
@@ -108,17 +109,46 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 
                 const SizedBox(height: 24),
+                
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EditProfilePage(user: user),
+                        ),
+                      );
+
+                      if (result == true) {
+                        setState(() {
+                          final request = context.read<CookieRequest>();
+                          _dataFuture = fetchProfileAndNews(request);
+                        });
+                      }
+                    },
+                    label: const Text("Edit Profile"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                ),
 
                 Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
-                        _buildSimpleRow("Bio", user.bio),
+                        _baris("Bio", user.bio),
                         const Divider(),
-                        _buildSimpleRow("Bergabung", user.dateJoined),
+                        _baris("Bergabung", user.dateJoined),
                         const Divider(),
-                        _buildSimpleRow("Total Strike", "${user.strikes}"),
+                        _baris("Total Strike", "${user.strikes}"),
                       ],
                     ),
                   ),
@@ -203,7 +233,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildSimpleRow(String label, String value) {
+  Widget _baris(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [

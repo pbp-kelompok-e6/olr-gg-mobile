@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:olrggmobile/widgets/left_drawer.dart'; 
 import 'package:olrggmobile/users/models/admin_models.dart';
 import 'package:olrggmobile/users/screens/profile_page.dart'; 
+import 'package:olrggmobile/users/screens/admin_edit_user.dart';
 
 class AdminDashboardPage extends StatefulWidget {
   const AdminDashboardPage({super.key});
@@ -163,7 +164,11 @@ class _UserListTab extends StatefulWidget {
   final Future<void> Function() onRefresh;
   final Function(int) onRequestAction;
 
-  const _UserListTab({required this.users, required this.onRefresh, required this.onRequestAction});
+  const _UserListTab({
+    required this.users, 
+    required this.onRefresh, 
+    required this.onRequestAction
+  });
 
   @override
   State<_UserListTab> createState() => _UserListTabState();
@@ -172,6 +177,45 @@ class _UserListTab extends StatefulWidget {
 class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  // Fungsi untuk navigasi ke halaman Edit
+  void _navigateToEditPage(AdminUser user) async {
+    // Memecah Full Name menjadi First Name & Last Name (Estimasi kasar)
+    String firstName = "";
+    String lastName = "";
+    List<String> names = user.fullName.trim().split(" ");
+    if (names.isNotEmpty) {
+      firstName = names.first;
+      if (names.length > 1) {
+        lastName = names.sublist(1).join(" ");
+      }
+    }
+
+    // Navigasi
+    final bool? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdminEditUserPage(
+          userId: user.id,
+          initialData: {
+            'username': user.username,
+            'first_name': firstName,
+            'last_name': lastName,
+            'email': '', 
+            'bio': '',
+            'role': user.role,
+            'strikes': user.strikes,
+            'profile_picture_url': user.profilePictureUrl,
+          },
+        ),
+      ),
+    );
+
+    // Jika result == true (berhasil simpan), refresh dashboard
+    if (result == true) {
+      widget.onRefresh();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,6 +234,7 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () {
+                // Tetap bisa tap card untuk lihat profil publik (opsional)
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ProfilePage(userId: user.id)),
@@ -199,6 +244,7 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
                   children: [
+                    // --- Header: Avatar, Nama, Role ---
                     Row(
                       children: [
                         CircleAvatar(
@@ -206,7 +252,7 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                           backgroundColor: Colors.grey[300],
                           backgroundImage: (user.profilePictureUrl.isEmpty || user.profilePictureUrl.contains("default"))
                               ? const AssetImage('images/default_profile_picture.jpg') as ImageProvider
-                              : CachedNetworkImageProvider('http://localhost:8000${user.profilePictureUrl}'),
+                              : CachedNetworkImageProvider('http://localhost:8000${user.profilePictureUrl}'), // Ganti localhost -> 10.0.2.2 jika di emulator
                           onBackgroundImageError: (_, __) {},
                         ),
                         const SizedBox(width: 12),
@@ -223,6 +269,8 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                       ],
                     ),
                     const Divider(height: 20),
+                    
+                    // --- Info: Status & Strikes ---
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -230,17 +278,48 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                         _AdminHelpers.buildStrikesBadge(user.strikes),
                       ],
                     ),
-                    if (user.strikes > 0) ...[
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          icon: const Icon(Icons.refresh, size: 16),
-                          label: const Text("Reset Strikes"),
-                          onPressed: () => _AdminHelpers.showConfirmDialog(context, "Reset", "Reset strike?", () => widget.onRequestAction(user.id)),
+                    
+                    const SizedBox(height: 12),
+                    
+                    // --- Action Buttons (Edit & Reset Strikes) ---
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        // Tombol Edit
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.indigo,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            textStyle: const TextStyle(fontSize: 12),
+                          ),
+                          icon: const Icon(Icons.edit, size: 14),
+                          label: const Text("Edit User"),
+                          onPressed: () => _navigateToEditPage(user),
                         ),
-                      )
-                    ]
+
+                        // Tombol Reset Strikes (Hanya muncul jika strikes > 0)
+                        if (user.strikes > 0) ...[
+                          const SizedBox(width: 8),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.orange[800],
+                              side: BorderSide(color: Colors.orange[800]!),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              textStyle: const TextStyle(fontSize: 12),
+                            ),
+                            icon: const Icon(Icons.refresh, size: 14),
+                            label: const Text("Reset Strike"),
+                            onPressed: () => _AdminHelpers.showConfirmDialog(
+                              context, 
+                              "Reset Strikes", 
+                              "Reset strikes untuk user ini menjadi 0?", 
+                              () => widget.onRequestAction(user.id)
+                            ),
+                          ),
+                        ]
+                      ],
+                    )
                   ],
                 ),
               ),
@@ -265,7 +344,7 @@ class _ReportListTab extends StatefulWidget {
 
 class _ReportListTabState extends State<_ReportListTab> with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive => true; // <--- INI KUNCINYA
+  bool get wantKeepAlive => true; 
 
   @override
   Widget build(BuildContext context) {
@@ -389,9 +468,6 @@ class _RequestListTabState extends State<_RequestListTab> with AutomaticKeepAliv
   }
 }
 
-// ============================================================================
-// HELPERS (Untuk mempersingkat kode)
-// ============================================================================
 class _AdminHelpers {
   static Widget buildRoleBadge(String role) {
     return Container(

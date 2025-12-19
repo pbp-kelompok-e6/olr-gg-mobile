@@ -75,7 +75,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
-  // --- FUNGSI REPORT USER (Pop Up Dialog) ---
+  // buat popup report
   void _showReportDialog(BuildContext context, String targetUserId, String username) {
     showDialog(
       context: context,
@@ -129,9 +129,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   _formKey.currentState!.save();
                   final request = context.read<CookieRequest>();
                   
-                  // Kirim Request ke Backend
-                  // Endpoint: /users/report_user/<id>/
-                  // Method: POST (Wajib POST agar tidak return HTML)
                   try {
                     final response = await request.post(
                       'http://localhost:8000/users/report_user/$targetUserId/',
@@ -141,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     );
 
                     if (context.mounted) {
-                      Navigator.of(context).pop(); // Tutup Dialog
+                      Navigator.of(context).pop(); 
                       
                       if (response['status'] == 'success') {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -151,11 +148,8 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         );
                       } else {
-                        // Handle error validation dari Django
                         String errMessage = response['message'] ?? "Terjadi kesalahan";
                         if (response['errors'] != null) {
-                           // Jika error berupa JSON string dari form.errors.as_json()
-                           // Kita perlu parsing sedikit atau tampilkan generic error
                            errMessage = "Isian form tidak valid.";
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -186,6 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     final pageTitle = widget.userId != null ? 'User Profile' : 'My Profile';
 
     return Scaffold(
@@ -213,13 +208,10 @@ class _ProfilePageState extends State<ProfilePage> {
           final UserProfile user = snapshot.data!['profile'];
           final List<NewsEntry> newsList = snapshot.data!['news'];
           
-          // Logic Owner: Jika widget.userId null (akses dari drawer) -> pasti owner
-          // Atau jika backend mengirim flag is_owner (opsional, tp kita pakai logic userId)
-          bool isOwner = widget.userId == null;
-
-          // Tambahan: Jika akses dari Admin Dashboard tapi user ID nya sama dengan yang login,
-          // kita tidak bisa cek di sini tanpa data request.user.id dari cookie.
-          // Tapi untuk keamanan, Backend Report User akan menolak jika lapor diri sendiri.
+          String? currentUser = request.jsonData['username'];
+          String? currentRole = request.jsonData['role'];
+          bool isAdmin = currentRole == "admin";
+          bool isOwner = widget.userId == null || (currentUser != null && user.username == currentUser);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
@@ -227,7 +219,7 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.stretch, 
               children: [
                 
-                // --- SECTION 1: HEADER USER (Vertical Center) ---
+                // header
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                   decoration: BoxDecoration(
@@ -243,7 +235,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Column(
                     children: [
-                      // 1. Foto Profil (Besar di Tengah)
+                      // foto profil
                       Stack(
                         alignment: Alignment.bottomRight,
                         children: [
@@ -256,7 +248,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             onBackgroundImageError: (_, __) {},
                           ),
                           
-                          // TOMBOL EDIT (Hanya Jika Owner)
+                          // edit klo owner
                           if (isOwner)
                             Container(
                               decoration: const BoxDecoration(
@@ -281,7 +273,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ),
                             ),
 
-                          // TOMBOL REPORT (Hanya Jika BUKAN Owner)
+                          // tombol report
                           if (!isOwner)
                             Container(
                               decoration: const BoxDecoration(
@@ -293,7 +285,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                 icon: const Icon(Icons.flag, color: Colors.red, size: 20),
                                 tooltip: "Report User",
                                 onPressed: () {
-                                  // Panggil fungsi dialog report
                                   final request = context.read<CookieRequest>();
                                   _showReportDialog(context, user.id, user.username);
                                 },
@@ -304,7 +295,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       
                       const SizedBox(height: 16),
                       
-                      // 2. Nama Lengkap (Center)
+                      // full name
                       Text(
                         user.fullName,
                         textAlign: TextAlign.center,
@@ -317,7 +308,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       
                       const SizedBox(height: 8),
 
-                      // 3. Username & Role Badge (Center)
+                      // username ama role
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -346,7 +337,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                       const SizedBox(height: 20),
                       
-                      // 4. Info Stats
+                      // join kapan ama strike brp
                       const Divider(),
                       const SizedBox(height: 8),
                       Row(
@@ -354,7 +345,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           _buildStatColumn("Joined", _formatDate(DateTime.parse(user.dateJoined))),
                           Container(height: 30, width: 1, color: Colors.grey[300]),
-                          _buildStatColumn("Strikes", "${user.strikes}"),
+                          if (isOwner || isAdmin)
+                            _buildStatColumn("Strikes", "${user.strikes}"),
                         ],
                       ),
                     ],
@@ -363,7 +355,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 24),
 
-                // --- SECTION 2: ABOUT ---
+                // about
                 _buildSectionTitle("About"),
                 const SizedBox(height: 12),
                 Container(
@@ -384,8 +376,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 24),
 
-                // --- SECTION 3: POSTS ---
-                _buildSectionTitle("Posts by @${user.username}"),
+                // list news dia
+                _buildSectionTitle("News by @${user.username}"),
                 const SizedBox(height: 12),
 
                 if (newsList.isEmpty)
@@ -412,7 +404,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemBuilder: (context, index) {
                       final news = newsList[index];
                       
-                      // Logic Thumbnail
+                      // thumbnail
                       String thumbnailUrl = "";
                       if (news.thumbnail.isNotEmpty && !news.thumbnail.contains("default")) {
                         if (news.thumbnail.startsWith('http')) {

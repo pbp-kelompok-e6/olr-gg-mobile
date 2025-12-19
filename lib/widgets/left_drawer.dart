@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:olrggmobile/screens/login.dart';
 import 'package:olrggmobile/users/screens/profile_page.dart';
 import 'package:olrggmobile/users/screens/admin_dashboard_page.dart';
+import 'package:olrggmobile/users/screens/request_writer_role.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -81,6 +82,17 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+          if (role == "reader" && role != "admin")
+          ListTile(
+            leading: const Icon(Icons.history_edu),
+            title: const Text('Be a Writer'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RequestWriterPage()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('My Profile'),
@@ -91,6 +103,7 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+          if (role == "admin")
           ListTile(
             leading: const Icon(Icons.admin_panel_settings),
             title: const Text('Admin Dashboard'),

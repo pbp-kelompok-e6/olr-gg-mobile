@@ -1,7 +1,10 @@
+import 'package:http/http.dart';
+
 class AdminUser {
   final int id;
   final String username;
   final String fullName;
+  // final String bio;
   final String role;
   final bool isActive;
   final int strikes;
@@ -12,6 +15,7 @@ class AdminUser {
     required this.id,
     required this.username,
     required this.fullName,
+    // required this.bio,
     required this.role,
     required this.isActive,
     required this.strikes,
@@ -24,6 +28,7 @@ class AdminUser {
       id: json['id'],
       username: json['username'],
       fullName: json['full_name'],
+      // bio: json['bio'],
       role: json['role'],
       isActive: json['is_active'],
       strikes: json['strikes'],

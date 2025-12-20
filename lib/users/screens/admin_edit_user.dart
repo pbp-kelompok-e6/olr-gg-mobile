@@ -20,14 +20,12 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  // Controllers
   late TextEditingController _usernameController;
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _bioController;
   late TextEditingController _strikesController;
 
-  // Role Dropdown
   String? _selectedRole;
   final List<String> _roleOptions = ['reader', 'writer', 'admin'];
 
@@ -42,7 +40,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
     _bioController = TextEditingController(text: data['bio'] ?? '');
     _strikesController = TextEditingController(text: (data['strikes'] ?? 0).toString());
 
-    // Set Role awal
     String initialRole = data['role'] ?? 'reader';
     if (_roleOptions.contains(initialRole)) {
       _selectedRole = initialRole;
@@ -66,12 +63,9 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
     setState(() => _isLoading = true);
 
-    // Gunakan localhost untuk Web/Chrome
     final String url = "http://localhost:8000/users/admin-dashboard/edit-user/${widget.userId}/";
 
     try {
-      // Kita pakai request.post bawaan pbp_django_auth
-      // Ini OTOMATIS mengurus Cookie Session & CSRF Token
       final response = await request.post(url, {
         'username': _usernameController.text,
         'role': _selectedRole ?? 'reader',
@@ -79,7 +73,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
         'first_name': _firstNameController.text,
         'last_name': _lastNameController.text,
         'bio': _bioController.text,
-        // Kita tidak kirim data gambar, jadi Django akan membiarkan gambar yang lama
       });
 
       if (response['status'] == 'success') {
@@ -87,12 +80,10 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("User berhasil diupdate!")),
           );
-          // Kembali ke dashboard dengan nilai 'true' agar list direfresh
           Navigator.pop(context, true);
         }
       } else {
         if (mounted) {
-          // Tampilkan error jika validasi form Django gagal
           String msg = "Gagal menyimpan update.";
           if (response['errors'] != null) {
             msg = "Error: ${response['errors']}";
@@ -117,13 +108,12 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Ambil CookieRequest dari Provider
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin: Edit User'),
-        backgroundColor: Colors.indigo, // Sesuaikan dengan Dashboard
+        backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
       body: Form(
@@ -139,7 +129,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
               ),
               const SizedBox(height: 20),
 
-              // --- USERNAME ---
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
@@ -151,10 +140,8 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
               ),
               const SizedBox(height: 16),
 
-              // --- ROLE & STRIKES ---
               Row(
                 children: [
-                  // Dropdown Role
                   Expanded(
                     flex: 2,
                     child: DropdownButtonFormField<String>(
@@ -174,7 +161,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // Input Strikes
                   Expanded(
                     flex: 1,
                     child: TextFormField(
@@ -195,7 +181,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
               ),
               const SizedBox(height: 16),
 
-              // --- DATA PRIBADI ---
               const Divider(),
               const SizedBox(height: 8),
               
@@ -224,7 +209,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
               ),
               const SizedBox(height: 16),
 
-              // --- BIO ---
               TextFormField(
                 controller: _bioController,
                 maxLines: 3,
@@ -237,7 +221,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
               
               const SizedBox(height: 32),
 
-              // --- TOMBOL SUBMIT ---
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

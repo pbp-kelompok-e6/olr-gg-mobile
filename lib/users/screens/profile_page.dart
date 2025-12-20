@@ -219,7 +219,6 @@ class _ProfilePageState extends State<ProfilePage> {
               crossAxisAlignment: CrossAxisAlignment.stretch, 
               children: [
                 
-                // header
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                   decoration: BoxDecoration(
@@ -235,17 +234,35 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   child: Column(
                     children: [
-                      // foto profil
                       Stack(
                         alignment: Alignment.bottomRight,
                         children: [
                           CircleAvatar(
                             radius: 50,
                             backgroundColor: Colors.grey[200],
-                            backgroundImage: (user.profilePictureUrl.isEmpty || user.profilePictureUrl.contains("default"))
-                                ? const AssetImage('images/default_profile_picture.jpg') as ImageProvider
-                                : CachedNetworkImageProvider('http://localhost:8000${user.profilePictureUrl}'),
-                            onBackgroundImageError: (_, __) {},
+                            backgroundImage: () {
+                              String url = user.profilePictureUrl;
+
+                              if (url.isEmpty) {
+                                return const AssetImage('images/default_profile_picture.jpg');
+                              }
+
+                              if (url.startsWith('http')) {
+                                return CachedNetworkImageProvider(
+                                    'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(url)}'
+                                );
+                              }
+
+                              else {
+                                if (!url.startsWith('/')) url = '/$url';
+
+                                return CachedNetworkImageProvider('http://localhost:8000$url');
+                              }
+                            }() as ImageProvider,
+
+                            onBackgroundImageError: (_, __) {
+                              print("Gagal load image: ${user.profilePictureUrl}");
+                            },
                           ),
                           
                           // edit klo owner

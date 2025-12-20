@@ -5,6 +5,9 @@ import 'package:olrggmobile/screens/news_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/screens/login.dart';
+import 'package:olrggmobile/users/screens/profile_page.dart';
+import 'package:olrggmobile/users/screens/admin_dashboard_page.dart';
+import 'package:olrggmobile/users/screens/request_writer_role.dart';
 import 'package:olrggmobile/forum/screens/forum_entry_list.dart';
 import 'package:olrggmobile/forum/screens/forumlist_form.dart';
 
@@ -80,7 +83,6 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
-
           // FORUM
           ListTile(
             leading: const Icon(Icons.chat),
@@ -103,7 +105,38 @@ class LeftDrawer extends StatelessWidget {
                 );
               },
             ),
-
+          if (role == "reader" && role != "admin")
+          ListTile(
+            leading: const Icon(Icons.history_edu),
+            title: const Text('Be a Writer'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RequestWriterPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('My Profile'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+          if (role == "admin")
+          ListTile(
+            leading: const Icon(Icons.admin_panel_settings),
+            title: const Text('Admin Dashboard'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

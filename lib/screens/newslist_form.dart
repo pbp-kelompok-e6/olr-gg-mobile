@@ -37,9 +37,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
       filled: true,
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 
@@ -84,17 +82,12 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       const SizedBox(height: 6),
                       const Text(
                         "Share your football news and stories with the community",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                       const Divider(height: 32),
                       TextFormField(
-                        decoration:
-                        inputStyle("Title", "Enter news title"),
-                        validator: (value) =>
-                        value == null || value.isEmpty
+                        decoration: inputStyle("Title", "Enter news title"),
+                        validator: (value) => value == null || value.isEmpty
                             ? "Title cannot be empty"
                             : null,
                         onChanged: (value) => _title = value,
@@ -102,10 +95,8 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       const SizedBox(height: 16),
                       TextFormField(
                         maxLines: 5,
-                        decoration:
-                        inputStyle("Content", "Enter news content"),
-                        validator: (value) =>
-                        value == null || value.isEmpty
+                        decoration: inputStyle("Content", "Enter news content"),
+                        validator: (value) => value == null || value.isEmpty
                             ? "Content cannot be empty"
                             : null,
                         onChanged: (value) => _content = value,
@@ -123,17 +114,15 @@ class _NewsFormPageState extends State<NewsFormPage> {
                             ),
                           ),
                           ..._categories.map(
-                                (c) => DropdownMenuItem(
+                            (c) => DropdownMenuItem(
                               value: c,
-                              child: Text(
-                                c[0].toUpperCase() + c.substring(1),
-                              ),
+                              child: Text(c[0].toUpperCase() + c.substring(1)),
                             ),
                           ),
                         ],
                         validator: (value) {
                           if (value == null) {
-                            return "Pilih kategori";
+                            return "Choose Category";
                           }
                           return null;
                         },
@@ -153,14 +142,14 @@ class _NewsFormPageState extends State<NewsFormPage> {
                       ),
                       const SizedBox(height: 16),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.2,
-                          ),
+                          border: Border.all(color: Colors.black, width: 1.2),
                         ),
                         child: SwitchListTile(
                           contentPadding: EdgeInsets.zero,
@@ -189,7 +178,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                                 Navigator.pop(context);
                               },
                               style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.black
+                                foregroundColor: Colors.black,
                               ),
                               child: const Text("Cancel"),
                             ),
@@ -200,13 +189,13 @@ class _NewsFormPageState extends State<NewsFormPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red[700],
                                 foregroundColor: Colors.white,
-                                padding:
-                                const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                               ),
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  final response =
-                                  await request.postJson(
+                                  final response = await request.postJson(
                                     "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/create-flutter/",
                                     jsonEncode({
                                       "title": _title,
@@ -219,8 +208,9 @@ class _NewsFormPageState extends State<NewsFormPage> {
 
                                   if (context.mounted) {
                                     if (response["status"] == "success") {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         const SnackBar(
                                           content: Text(
                                             "News successfully published",
@@ -234,8 +224,9 @@ class _NewsFormPageState extends State<NewsFormPage> {
                                         ),
                                       );
                                     } else {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
                                         const SnackBar(
                                           content: Text(
                                             "Failed to publish news",

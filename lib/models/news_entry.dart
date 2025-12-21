@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-List<NewsEntry> newsEntryFromJson(String str) => List<NewsEntry>.from(json.decode(str).map((x) => NewsEntry.fromJson(x)));
+List<NewsEntry> newsEntryFromJson(String str) =>
+    List<NewsEntry>.from(json.decode(str).map((x) => NewsEntry.fromJson(x)));
 
-String newsEntryToJson(List<NewsEntry> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String newsEntryToJson(List<NewsEntry> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class NewsEntry {
   String id;
@@ -18,6 +20,8 @@ class NewsEntry {
   DateTime createdAt;
   String userId;
   String userUsername;
+  double? averageRating;
+  int ratingCount;
 
   NewsEntry({
     required this.id,
@@ -28,7 +32,9 @@ class NewsEntry {
     required this.isFeatured,
     required this.createdAt,
     required this.userId,
-    required this.userUsername
+    required this.userUsername,
+    this.averageRating,
+    required this.ratingCount,
   });
 
   factory NewsEntry.fromJson(Map<String, dynamic> json) => NewsEntry(
@@ -41,6 +47,10 @@ class NewsEntry {
     createdAt: DateTime.parse(json["created_at"]),
     userUsername: json["user_username"],
     userId: json["user_id"].toString(),
+    averageRating: json["average_rating"] != null
+        ? json["average_rating"].toDouble()
+        : null,
+    ratingCount: json["rating_count"] ?? 0,
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,5 +63,7 @@ class NewsEntry {
     "created_at": createdAt.toIso8601String(),
     "user_id": userId,
     "user_username": userUsername,
+    "average_rating": averageRating,
+    "rating_count": ratingCount,
   };
 }

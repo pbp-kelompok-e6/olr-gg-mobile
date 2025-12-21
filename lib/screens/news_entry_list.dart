@@ -11,7 +11,11 @@ class NewsEntryListPage extends StatefulWidget {
   final bool showOnlyMine;
   final String? category;
 
-  const NewsEntryListPage({super.key, this.showOnlyMine = false, this.category});
+  const NewsEntryListPage({
+    super.key,
+    this.showOnlyMine = false,
+    this.category,
+  });
 
   @override
   State<NewsEntryListPage> createState() => _NewsEntryListPageState();
@@ -33,7 +37,9 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
   }
 
   Future<List<NewsEntry>> fetchNews(CookieRequest request) async {
-    final response = await request.get('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/json/');
+    final response = await request.get(
+      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/json/',
+    );
     var data = response;
     List<NewsEntry> listNews = [];
     for (var d in data) {
@@ -53,13 +59,13 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
     String title = "All News";
     if (selectedFilter == "mine") title = "My News";
     if (selectedFilter == "featured") title = "Featured News";
-    if (selectedCategory != null) title = "${selectedCategory![0].toUpperCase()}${selectedCategory!.substring(1)} News";
+    if (selectedCategory != null)
+      title =
+          "${selectedCategory![0].toUpperCase()}${selectedCategory!.substring(1)} News";
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: Text(title),
-      ),
+      appBar: AppBar(title: Text(title)),
       drawer: const LeftDrawer(),
       body: Column(
         children: [
@@ -70,7 +76,11 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
               children: [
                 Text(
                   "Latest Sports News",
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: Colors.grey[900]),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.grey[900],
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -89,12 +99,17 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                     onPressed: () {
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const NewsFormPage()),
+                        MaterialPageRoute(
+                          builder: (context) => const NewsFormPage(),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.add),
                     label: const Text("Create News"),
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red[600], foregroundColor: Colors.white),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red[600],
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   OutlinedButton(
@@ -106,10 +121,16 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                     },
                     child: Text(
                       "My News",
-                      style: TextStyle(color: selectedFilter == "mine" ? Colors.white : Colors.grey[800]),
+                      style: TextStyle(
+                        color: selectedFilter == "mine"
+                            ? Colors.white
+                            : Colors.grey[800],
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      backgroundColor: selectedFilter == "mine" ? Colors.red[600] : Colors.white,
+                      backgroundColor: selectedFilter == "mine"
+                          ? Colors.red[600]
+                          : Colors.white,
                     ),
                   ),
                 ],
@@ -121,9 +142,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
               future: fetchNews(request),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(
                     child: Text(
@@ -133,11 +152,16 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                   );
                 } else {
                   List<NewsEntry> news = snapshot.data!;
-                  if (selectedCategory != null && selectedCategory!.isNotEmpty) {
-                    news = news.where((p) => p.category == selectedCategory).toList();
+                  if (selectedCategory != null &&
+                      selectedCategory!.isNotEmpty) {
+                    news = news
+                        .where((p) => p.category == selectedCategory)
+                        .toList();
                   }
                   if (showOnlyMyNews) {
-                    news = news.where((p) => p.userUsername == currentUser).toList();
+                    news = news
+                        .where((p) => p.userUsername == currentUser)
+                        .toList();
                   }
                   news.sort((a, b) {
                     if (a.isFeatured && !b.isFeatured) return -1;
@@ -149,11 +173,18 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.newspaper, size: 64, color: Colors.grey),
+                          const Icon(
+                            Icons.newspaper,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
                           const SizedBox(height: 12),
                           const Text(
                             "No news found",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           const Text(
@@ -167,7 +198,10 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                                 onPressed: () {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (context) => const NewsFormPage()),
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NewsFormPage(),
+                                    ),
                                   );
                                 },
                                 icon: const Icon(Icons.add),
@@ -183,18 +217,23 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                     );
                   }
                   return ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: news.length,
                     itemBuilder: (context, index) {
                       return NewsEntryCard(
                         news: news[index],
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => NewsDetailPage(news: news[index]),
+                              builder: (context) =>
+                                  NewsDetailPage(news: news[index]),
                             ),
                           );
+                          setState(() {});
                         },
                       );
                     },

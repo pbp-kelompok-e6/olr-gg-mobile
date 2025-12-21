@@ -4,32 +4,48 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:olrggmobile/screens/edit_news.dart';
 import 'package:olrggmobile/screens/news_entry_list.dart';
+import 'package:olrggmobile/readinglist/widgets/reading_list_dialog.dart';
 
 class NewsEntryCard extends StatelessWidget {
   final NewsEntry news;
   final VoidCallback onTap;
 
-  const NewsEntryCard({
-    super.key,
-    required this.news,
-    required this.onTap,
-  });
+  const NewsEntryCard({super.key, required this.news, required this.onTap});
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   Color _getCategoryColor(String category) {
     switch (category) {
-      case 'basketball': return Colors.orange.shade600;
-      case 'soccer': return Colors.green.shade600;
-      case 'football': return Colors.blue.shade600;
-      case 'hockey': return Colors.cyan.shade600;
-      case 'volleyball': return Colors.yellow.shade600;
-      case 'baseball': return Colors.red.shade600;
-      default: return Colors.grey.shade600;
+      case 'basketball':
+        return Colors.orange.shade600;
+      case 'soccer':
+        return Colors.green.shade600;
+      case 'football':
+        return Colors.blue.shade600;
+      case 'hockey':
+        return Colors.cyan.shade600;
+      case 'volleyball':
+        return Colors.yellow.shade600;
+      case 'baseball':
+        return Colors.red.shade600;
+      default:
+        return Colors.grey.shade600;
     }
   }
 
@@ -77,7 +93,10 @@ class NewsEntryCard extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [Colors.black.withOpacity(0.4), Colors.transparent],
+                          colors: [
+                            Colors.black.withOpacity(0.4),
+                            Colors.transparent,
+                          ],
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                         ),
@@ -88,13 +107,17 @@ class NewsEntryCard extends StatelessWidget {
                     top: 8,
                     left: 8,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: _getCategoryColor(news.category),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        news.category[0].toUpperCase() + news.category.substring(1),
+                        news.category[0].toUpperCase() +
+                            news.category.substring(1),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -108,7 +131,10 @@ class NewsEntryCard extends StatelessWidget {
                       top: 8,
                       right: 8,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.yellow.shade700,
                           borderRadius: BorderRadius.circular(6),
@@ -130,13 +156,56 @@ class NewsEntryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _formatDate(news.createdAt),
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          _formatDate(news.createdAt),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // TAMBAHAN: rating
+                        if (news.averageRating != null)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: Colors.amber.shade600,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                news.averageRating!.toStringAsFixed(1),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber.shade700,
+                                ),
+                              ),
+                              Text(
+                                ' (${news.ratingCount})',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          const Text(
+                            'No ratings yet',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                      ],
                     ),
+
                     const SizedBox(height: 4),
                     Text(
                       news.title,
@@ -160,28 +229,45 @@ class NewsEntryCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            Text(
-                              'Read more →',
-                              style: TextStyle(
-                                color: Colors.red.shade600,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                          ],
+                        Text(
+                          'Read more →',
+                          style: TextStyle(
+                            color: Colors.red.shade600,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                          Row(
-                            children: [
-                              if (news.userUsername == currentUser)
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (request.loggedIn) ...[
+                              const SizedBox(width: 8),
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blue),
+                                icon: const Icon(
+                                  Icons.bookmark_add_outlined,
+                                  color: Colors.blue,
+                                ),
+                                tooltip: "Add to Reading List",
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        ReadingListDialog(newsId: news.id),
+                                  );
+                                },
+                              ),
+                            ],
+                            if (news.userUsername == currentUser)
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blue,
+                                ),
                                 onPressed: () async {
                                   final updated = await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => EditNewsPage(news: news),
+                                      builder: (context) =>
+                                          EditNewsPage(news: news),
                                     ),
                                   );
                                   if (updated == true) {
@@ -189,26 +275,40 @@ class NewsEntryCard extends StatelessWidget {
                                   }
                                 },
                               ),
-                              if (news.userUsername == currentUser || role == "admin")
+                            if (news.userUsername == currentUser ||
+                                role == "admin")
                               IconButton(
-                                icon: const Icon(Icons.delete, color: Colors.red),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Colors.red,
+                                ),
                                 onPressed: () async {
                                   final shouldDelete = await showDialog<bool>(
                                     context: context,
                                     builder: (context) {
                                       return AlertDialog(
                                         title: const Text("Konfirmasi Delete"),
-                                        content: const Text("Apakah Anda yakin ingin menghapus berita ini?"),
+                                        content: const Text(
+                                          "Apakah Anda yakin ingin menghapus berita ini?",
+                                        ),
                                         actions: [
                                           TextButton(
-                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                            ),
                                             child: const Text("Ya"),
-                                            onPressed: () => Navigator.pop(context, true),
+                                            onPressed: () =>
+                                                Navigator.pop(context, true),
                                           ),
                                           ElevatedButton(
-                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue,
+                                              foregroundColor: Colors.white,
+                                            ),
                                             child: const Text("Tidak"),
-                                            onPressed: () => Navigator.pop(context, false),
+                                            onPressed: () =>
+                                                Navigator.pop(context, false),
                                           ),
                                         ],
                                       );
@@ -221,23 +321,32 @@ class NewsEntryCard extends StatelessWidget {
                                   );
                                   if (response['success'] == true) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("News deleted successfully")),
+                                      const SnackBar(
+                                        content: Text(
+                                          "News deleted successfully",
+                                        ),
+                                      ),
                                     );
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => NewsEntryListPage()),
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NewsEntryListPage(),
+                                      ),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Failed to delete news")),
+                                      const SnackBar(
+                                        content: Text("Failed to delete news"),
+                                      ),
                                     );
                                   }
                                 },
                               ),
-                            ],
-                          ),
+                          ],
+                        ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),

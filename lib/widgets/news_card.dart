@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:olrggmobile/screens/news_entry_list.dart';
+import 'package:olrggmobile/forum/screens/forum_entry_list.dart';
 
 class ItemHomepage {
   final String title;

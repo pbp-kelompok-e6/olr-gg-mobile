@@ -5,6 +5,9 @@ import 'package:olrggmobile/screens/news_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/screens/login.dart';
+import 'package:olrggmobile/users/screens/profile_page.dart';
+import 'package:olrggmobile/users/screens/admin_dashboard_page.dart';
+import 'package:olrggmobile/users/screens/request_writer_role.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -139,6 +142,41 @@ class LeftDrawer extends StatelessWidget {
               hoverColor: Colors.white10,
               onTap: () => Navigator.pushReplacement(
                   context, MaterialPageRoute(builder: (_) => const NewsFormPage())),
+            ),
+          if (role == "reader" && role != "admin")
+            ListTile(
+              leading: const Icon(Icons.history_edu, color: Colors.grey),
+              title: const Text('Be a Writer', style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const RequestWriterPage()),
+                );
+              },
+            ),
+          ListTile(
+            leading: const Icon(Icons.person, color: Colors.grey),
+            title: const Text('My Profile', style: TextStyle(color: Colors.grey)),
+            hoverColor: Colors.white10,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+          if (role == "admin")
+            ListTile(
+              leading: const Icon(Icons.admin_panel_settings, color: Colors.grey),
+              title: const Text('Admin Dashboard', style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
+                );
+              },
             ),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.grey),

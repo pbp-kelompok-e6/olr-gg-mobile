@@ -36,8 +36,28 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
-              .copyWith(secondary: Colors.blueAccent[300]),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white, surface: Colors.white),
+          inputDecorationTheme: const InputDecorationTheme(
+            enabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.black, width: 2),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.red, width: 2),
+            ),
+            labelStyle: TextStyle(color: Colors.black),
+            hintStyle: TextStyle(color: Colors.grey),
+          ),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.grey,
+            elevation: 2,
+          ),
         ),
         home: const LoginPage()
       ),

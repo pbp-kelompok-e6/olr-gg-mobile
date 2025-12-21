@@ -5,13 +5,13 @@ import 'package:olrggmobile/screens/news_detail.dart';
 import 'package:olrggmobile/widgets/news_entry_card.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-import 'package:olrggmobile/screens/news_detail.dart';
+import 'package:olrggmobile/screens/newslist_form.dart';
 
 class NewsEntryListPage extends StatefulWidget {
   final bool showOnlyMine;
-  final bool showFeatured;
+  final String? category;
 
-  const NewsEntryListPage({super.key, this.showOnlyMine = false, this.showFeatured = false,});
+  const NewsEntryListPage({super.key, this.showOnlyMine = false, this.category});
 
   @override
   State<NewsEntryListPage> createState() => _NewsEntryListPageState();
@@ -19,30 +19,22 @@ class NewsEntryListPage extends StatefulWidget {
 
 class _NewsEntryListPageState extends State<NewsEntryListPage> {
   late bool showOnlyMyNews;
-  late bool showFeatured;
 
   String selectedFilter = "all";
+  String? selectedCategory;
 
   @override
   void initState() {
     super.initState();
     showOnlyMyNews = widget.showOnlyMine;
-    showFeatured = widget.showFeatured;
+    selectedCategory = widget.category;
 
     if (showOnlyMyNews) selectedFilter = "mine";
-    if (showFeatured) selectedFilter = "featured";
   }
+
   Future<List<NewsEntry>> fetchNews(CookieRequest request) async {
-    // TODO: Replace the URL with your app's URL and don't forget to add a trailing slash (/)!
-    // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-    // If you using chrome,  use URL http://localhost:8000
-
     final response = await request.get('http://localhost:8000/json/');
-
-    // Decode response to json format
     var data = response;
-
-    // Convert json data to NewsEntry objects
     List<NewsEntry> listNews = [];
     for (var d in data) {
       if (d != null) {
@@ -54,103 +46,159 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
+    final role = request.jsonData["role"];
+    final currentUser = request.jsonData["user_username"];
 
     String title = "All News";
     if (selectedFilter == "mine") title = "My News";
     if (selectedFilter == "featured") title = "Featured News";
-    final request = context.watch<CookieRequest>();
-    final role = request.jsonData["role"];
+    if (selectedCategory != null) title = "${selectedCategory![0].toUpperCase()}${selectedCategory!.substring(1)} News";
+
     return Scaffold(
-      backgroundColor: Colors.blue[300],
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.yellow[700],
         title: Text(title),
       ),
       drawer: const LeftDrawer(),
       body: Column(
-          children: [
-          const SizedBox(height: 10),
+        children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: DropdownButtonFormField<String>(
-              value: selectedFilter,
-              decoration: const InputDecoration(
-                labelText: "Filter",
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                DropdownMenuItem(
-                  value: "all",
-                  child: Text("All News"),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Latest Sports News",
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: Colors.grey[900]),
                 ),
-                if (role != "reader")
-                  DropdownMenuItem(
-                    value: "mine",
-                    child: Text("My News"),
-                  ),
-                DropdownMenuItem(
-                  value: "featured",
-                  child: Text("Featured News"),
+                const SizedBox(height: 4),
+                Text(
+                  "Stay updated with the latest stories and analysis from around the globe",
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
               ],
-              onChanged: (value) {
-                if (value == "mine" && role == "reader") return;
-                setState(() {
-                  selectedFilter = value!;
-
-                  showOnlyMyNews = selectedFilter == "mine";
-                  showFeatured = selectedFilter == "featured";
-                });
-              },
             ),
           ),
+          if (role != "reader")
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const NewsFormPage()),
+                      );
+                    },
+                    icon: const Icon(Icons.add),
+                    label: const Text("Create News"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.red[600], foregroundColor: Colors.white),
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedFilter = "mine";
+                        showOnlyMyNews = true;
+                      });
+                    },
+                    child: Text(
+                      "My News",
+                      style: TextStyle(color: selectedFilter == "mine" ? Colors.white : Colors.grey[800]),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      backgroundColor: selectedFilter == "mine" ? Colors.red[600] : Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           const SizedBox(height: 10),
           Expanded(
-            child: FutureBuilder(
+            child: FutureBuilder<List<NewsEntry>>(
               future: fetchNews(request),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (snapshot.data == null) {
-                  return const Center(child: CircularProgressIndicator());
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      "Failed to load news",
+                      style: TextStyle(color: Colors.red[600], fontSize: 16),
+                    ),
+                  );
                 } else {
-                  if (!snapshot.hasData) {
-                    return const Column(
-                      children: [
-                        Text(
-                          'There are no news in OLR.GG yet.',
-                          style: TextStyle(fontSize: 20, color: Color(0xff59A5D8)),
-                        ),
-                        SizedBox(height: 8),
-                      ],
+                  List<NewsEntry> news = snapshot.data!;
+                  if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+                    news = news.where((p) => p.category == selectedCategory).toList();
+                  }
+                  if (showOnlyMyNews) {
+                    news = news.where((p) => p.userUsername == currentUser).toList();
+                  }
+                  news.sort((a, b) {
+                    if (a.isFeatured && !b.isFeatured) return -1;
+                    if (!a.isFeatured && b.isFeatured) return 1;
+                    return 0;
+                  });
+                  if (news.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.newspaper, size: 64, color: Colors.grey),
+                          const SizedBox(height: 12),
+                          const Text(
+                            "No news found",
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            "Be the first to share sports news with the community",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          if (role != "reader")
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const NewsFormPage()),
+                                  );
+                                },
+                                icon: const Icon(Icons.add),
+                                label: const Text("Create News"),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red[600],
+                                  foregroundColor: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     );
-                  } else {
-                    List<NewsEntry> news = snapshot.data!;
-                    if (showOnlyMyNews) {
-                      final userUsername = request.jsonData["user_username"];
-                      news =
-                          news.where((p) => p.userUsername == userUsername).toList();
-                    }
-                    if (showFeatured) {
-                      news = news.where((p) => p.isFeatured == true).toList();
-                    }
-                    return ListView.builder(
-                      itemCount: news.length,
-                      itemBuilder: (_, index) => NewsEntryCard(
+                  }
+                  return ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: news.length,
+                    itemBuilder: (context, index) {
+                      return NewsEntryCard(
                         news: news[index],
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => NewsDetailPage(
-                                news: news[index],
-                              ),
+                              builder: (context) => NewsDetailPage(news: news[index]),
                             ),
                           );
                         },
-                      ),
-                    );
-                  }
+                      );
+                    },
+                  );
                 }
               },
             ),

@@ -16,86 +16,149 @@ class LeftDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     final role = request.jsonData["role"];
+
     return Drawer(
-      backgroundColor: Colors.yellow[400],
+      backgroundColor: const Color(0xFF0F1117),
       child: ListView(
+        padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.yellow.shade700,
-            ),
+            decoration: BoxDecoration(color: Colors.black87),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'OLR.GG',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue,
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    children: [
+                      TextSpan(text: "OLR.", style: TextStyle(color: Colors.blue.shade400)),
+                      TextSpan(text: "GG", style: TextStyle(color: Colors.red.shade400)),
+                    ],
                   ),
                 ),
-                Padding(padding: EdgeInsets.all(10)),
-                Text("Berita olahraga terbaik hanya di sini",
+                const SizedBox(height: 8),
+                Text(
+                  "Berita olahraga terbaik hanya di sini",
+                  style: TextStyle(color: Colors.grey.shade400, fontSize: 14),
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.normal,
-                  ),
                 ),
               ],
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home_outlined),
-            title: const Text('Home'),
-            // Bagian redirection ke MyHomePage
-            onTap: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyHomePage(),
-                  ));
-            },
+            leading: const Icon(Icons.home_outlined, color: Colors.grey),
+            title: const Text("Home", style: TextStyle(color: Colors.grey)),
+            hoverColor: Colors.white10,
+            onTap: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => MyHomePage()),
+            ),
+          ),
+          Theme(
+            data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+            child: ExpansionTile(
+              leading: const Icon(Icons.sports, color: Colors.grey),
+              title: const Text('Sports', style: TextStyle(color: Colors.grey)),
+              childrenPadding: const EdgeInsets.only(left: 16),
+              backgroundColor: const Color(0xFF1A1D29),
+              collapsedBackgroundColor: const Color(0xFF0F1117),
+              collapsedIconColor: Colors.grey,
+              iconColor: Colors.grey,
+              children: [
+                ListTile(
+                  title: const Text("Basketball", style: TextStyle(color: Colors.grey)),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) =>
+                            NewsEntryListPage(category: "basketball")),
+                  ),
+                ),
+                ListTile(
+                  title: const Text("Soccer", style: TextStyle(color: Colors.grey)),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => NewsEntryListPage(category: "soccer")),
+                  ),
+                ),
+                ListTile(
+                  title: const Text("Football", style: TextStyle(color: Colors.grey)),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => NewsEntryListPage(category: "football")),
+                  ),
+                ),
+                ListTile(
+                  title: const Text("Hockey", style: TextStyle(color: Colors.grey)),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => NewsEntryListPage(category: "hockey")),
+                  ),
+                ),
+                ListTile(
+                  title: const Text("Volleyball", style: TextStyle(color: Colors.grey)),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => NewsEntryListPage(category: "volleyball")),
+                  ),
+                ),
+                ListTile(
+                  title: const Text("Baseball", style: TextStyle(color: Colors.grey)),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => NewsEntryListPage(category: "baseball")),
+                  ),
+                ),
+                const Divider(color: Colors.grey),
+                ListTile(
+                  title: const Text(
+                    "All Sports News",
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  hoverColor: Colors.white10,
+                  onTap: () => Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => NewsEntryListPage())),
+                ),
+              ],
+            ),
           ),
           if (role != "reader" && request.loggedIn)
-          ListTile(
-            leading: const Icon(Icons.post_add),
-            title: const Text('Create News'),
-            // Bagian redirection ke ProductFormPage
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const NewsFormPage()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.store),
-            title: const Text('News List'),
-            onTap: () {
-              // Route to product list page
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NewsEntryListPage()),
-              );
-            },
-          ),
+            ListTile(
+              leading: const Icon(Icons.post_add, color: Colors.grey),
+              title: const Text("Create News", style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () => Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (_) => const NewsFormPage())),
+            ),
           if (role == "reader" && role != "admin")
+            ListTile(
+              leading: const Icon(Icons.history_edu, color: Colors.grey),
+              title: const Text('Be a Writer', style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const RequestWriterPage()),
+                );
+              },
+            ),
           ListTile(
-            leading: const Icon(Icons.history_edu),
-            title: const Text('Be a Writer'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const RequestWriterPage()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('My Profile'),
+            leading: const Icon(Icons.person, color: Colors.grey),
+            title: const Text('My Profile', style: TextStyle(color: Colors.grey)),
+            hoverColor: Colors.white10,
             onTap: () {
               Navigator.push(
                 context,
@@ -104,38 +167,37 @@ class LeftDrawer extends StatelessWidget {
             },
           ),
           if (role == "admin")
+            ListTile(
+              leading: const Icon(Icons.admin_panel_settings, color: Colors.grey),
+              title: const Text('Admin Dashboard', style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
+                );
+              },
+            ),
           ListTile(
-            leading: const Icon(Icons.admin_panel_settings),
-            title: const Text('Admin Dashboard'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AdminDashboardPage()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout),
-            title: const Text('Logout'),
+            leading: const Icon(Icons.logout, color: Colors.grey),
+            title: const Text("Logout", style: TextStyle(color: Colors.grey)),
+            hoverColor: Colors.white10,
             onTap: () async {
-              final response = await request.logout(
-                  "http://localhost:8000/auth/logout/");
+              final response = await request.logout("http://localhost:8000/auth/logout/");
               String message = response["message"];
               if (context.mounted) {
                 if (response['status']) {
                   String uname = response["username"];
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("$message See you again, $uname."),
-                  ));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("$message See you again, $uname.")),
+                  );
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                    MaterialPageRoute(builder: (_) => const LoginPage()),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(message),
-                    ),
+                    SnackBar(content: Text(message)),
                   );
                 }
               }

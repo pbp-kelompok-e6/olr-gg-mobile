@@ -6,6 +6,7 @@ import 'package:olrggmobile/comments/screens/comment_form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/readinglist/widgets/reading_list_dialog.dart';
+import 'package:olrggmobile/users/screens/profile_page.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
@@ -245,14 +246,6 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-                if (news.thumbnail.isNotEmpty)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
                     ),
                     Container(
                       width: double.infinity,
@@ -284,6 +277,7 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                               color: Colors.white,
                             ),
                           ),
+
                           const SizedBox(width: 12),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,12 +289,24 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                                   color: Colors.grey,
                                 ),
                               ),
-                              Text(
-                                currentNews.userUsername,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.black,
+                              InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProfilePage(
+                                        userId: currentNews.userId,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  currentNews.userUsername,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                    color: Colors.blue,
+                                  ),
                                 ),
                               ),
                             ],

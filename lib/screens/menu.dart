@@ -132,12 +132,18 @@ class MyHomePage extends StatelessWidget {
                           builder: (context, constraints) {
                             final width = constraints.maxWidth;
                             int crossAxisCount;
+                            double childAspectRatio;
+
                             if (width < 600) {
                               crossAxisCount = 1;
+                              childAspectRatio = 1.6; // Wider cards on mobile
                             } else if (width < 1000) {
                               crossAxisCount = 2;
+                              childAspectRatio = 1.0; // Square-ish for tablet
                             } else {
                               crossAxisCount = 3;
+                              childAspectRatio =
+                                  0.9; // Slightly taller for desktop
                             }
 
                             return GridView.builder(
@@ -148,7 +154,7 @@ class MyHomePage extends StatelessWidget {
                                     crossAxisCount: crossAxisCount,
                                     crossAxisSpacing: 16,
                                     mainAxisSpacing: 16,
-                                    childAspectRatio: 0.8,
+                                    childAspectRatio: childAspectRatio,
                                   ),
                               itemCount: categories.length,
                               itemBuilder: (context, index) {

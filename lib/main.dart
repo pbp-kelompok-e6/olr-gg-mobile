@@ -19,6 +19,7 @@ class MyApp extends StatelessWidget {
         return request;
       },
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'OLR.GG',
         theme: ThemeData(
           // This is the theme of your application.

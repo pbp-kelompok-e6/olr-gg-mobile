@@ -310,7 +310,63 @@ class _ReadingListPageState extends State<ReadingListPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
+              // Network error handling
+              final errorMsg = snapshot.error.toString();
+              final isNetworkError =
+                  errorMsg.contains('SocketException') ||
+                  errorMsg.contains('Connection') ||
+                  errorMsg.contains('timeout') ||
+                  errorMsg.contains('XMLHttpRequest');
+
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isNetworkError ? Icons.wifi_off : Icons.error_outline,
+                        size: 80,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        isNetworkError
+                            ? 'Tidak dapat terhubung ke server'
+                            : 'Terjadi kesalahan',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        isNetworkError
+                            ? 'Periksa koneksi internet Anda dan coba lagi.'
+                            : 'Silakan coba lagi nanti.',
+                        style: const TextStyle(color: Colors.grey),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: _refreshData,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Coba Lagi'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(
                 child: Column(

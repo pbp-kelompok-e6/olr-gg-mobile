@@ -79,8 +79,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         });
       }
     } catch (e) {
+      final errStr = e.toString();
+      final isNetworkError = errStr.contains('SocketException') ||
+          errStr.contains('Connection') ||
+          errStr.contains('timeout') ||
+          errStr.contains('XMLHttpRequest');
+      
       setState(() {
-        errorMessage = "Gagal terhubung: $e";
+        errorMessage = isNetworkError
+            ? 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
+            : 'Terjadi kesalahan. Silakan coba lagi.';
         isLoading = false;
       });
     }

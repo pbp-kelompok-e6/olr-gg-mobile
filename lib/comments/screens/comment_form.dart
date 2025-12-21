@@ -70,8 +70,20 @@ class _CommentFormState extends State<CommentForm> {
       }
     } catch (e) {
       if (mounted) {
+        final errStr = e.toString();
+        final isNetworkError = errStr.contains('SocketException') ||
+            errStr.contains('Connection') ||
+            errStr.contains('timeout');
+        
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(
+              isNetworkError
+                  ? 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
+                  : 'Gagal mengirim komentar. Silakan coba lagi.',
+            ),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {

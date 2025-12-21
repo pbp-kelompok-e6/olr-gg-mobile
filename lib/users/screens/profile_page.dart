@@ -19,22 +19,21 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  late Future<Map<String, dynamic>> _dataFuture;
+  late Future<Map<String, dynamic>> _futureData;
+
   final _formKey = GlobalKey<FormState>();
   String _reportReason = '';
 
   @override
   void initState() {
     super.initState();
-    final request = context.read<CookieRequest>();
-    _dataFuture = fetchProfileAndNews(request);
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    _futureData = _fetchAllData(request);
   }
 
-  Future<Map<String, dynamic>> fetchProfileAndNews(
-    CookieRequest request,
-  ) async {
-    String profileUrl;
+  Future<Map<String, dynamic>> _fetchAllData(CookieRequest request) async {
     String baseUrl = 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id';
+    String profileUrl;
 
     if (widget.userId != null) {
       profileUrl = '$baseUrl/users/show_profile/${widget.userId}/?type=json';
@@ -42,629 +41,269 @@ class _ProfilePageState extends State<ProfilePage> {
       profileUrl = '$baseUrl/users/api/profile/';
     }
 
-    try {
-      final profileResponse = await request.get(profileUrl);
-
-      if (profileResponse['status'] != 'success') {
-        throw Exception(
-          'Gagal memuat profil: ${profileResponse['message'] ?? "Unknown error"}',
-        );
-      }
-
-      final userProfile = UserProfile.fromJson(profileResponse['data']);
-
-      final newsResponse = await request.get(
-        '$baseUrl/users/load_news/?id=${userProfile.id}&type=json',
-      );
-
-      List<NewsEntry> newsList = [];
-      if (newsResponse['status'] == 'success') {
-        for (var item in newsResponse['news_list']) {
-          newsList.add(NewsEntry.fromJson(item));
-        }
-      }
-
-      return {'profile': userProfile, 'news': newsList};
-    } catch (e) {
-      rethrow;
+    final responseProfile = await request.get(profileUrl);
+    if (responseProfile['status'] != 'success') {
+      throw Exception(responseProfile['message'] ?? "Gagal load profil");
     }
+    final user = UserProfile.fromJson(responseProfile['data']);
+    final responseNews = await request.get(
+        '$baseUrl/users/load_news/?id=${user.id}&type=json'
+    );
+
+    List<NewsEntry> newsList = [];
+    if (responseNews['status'] == 'success') {
+      for (var d in responseNews['news_list']) {
+        if (d != null) newsList.add(NewsEntry.fromJson(d));
+      }
+    }
+
+    return {
+      'user': user,
+      'news': newsList,
+    };
+  }
+
+  Future<void> _refreshData() async {
+    final request = Provider.of<CookieRequest>(context, listen: false);
+    setState(() {
+      _futureData = _fetchAllData(request);
+    });
+    await _futureData;
+  }
+
+  void _showReportDialog(BuildContext context, String targetId, String username) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Report @$username"),
+        content: Form(
+          key: _formKey,
+          child: TextFormField(
+            decoration: const InputDecoration(labelText: "Alasan", border: OutlineInputBorder()),
+            maxLines: 3,
+            validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
+            onSaved: (v) => _reportReason = v!,
+          ),
+        ),
+        actions: [
+          TextButton(child: const Text("Batal"), onPressed: () => Navigator.pop(context)),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
+                Navigator.pop(context);
+                final request = context.read<CookieRequest>();
+                try {
+                  final response = await request.post(
+                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/report_user/$targetId/',
+                      {'reason': _reportReason}
+                  );
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
+                } catch (e) {
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+                }
+              }
+            },
+            child: const Text("Lapor", style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {
-    final months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
-  }
-
-  // buat popup report
-  void _showReportDialog(
-    BuildContext context,
-    String targetUserId,
-    String username,
-  ) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Report @$username"),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text("Apa alasan Anda melaporkan user ini?"),
-                const SizedBox(height: 12),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: "Alasan (Reason)",
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[50],
-                  ),
-                  maxLines: 3,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Alasan tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _reportReason = value!;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              child: const Text("Cancel", style: TextStyle(color: Colors.grey)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[600],
-                foregroundColor: Colors.white,
-              ),
-              onPressed: () async {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  final request = context.read<CookieRequest>();
-
-                  try {
-                    final response = await request.post(
-                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/report_user/$targetUserId/',
-                      {'reason': _reportReason},
-                    );
-
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-
-                      if (response['status'] == 'success') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(response['message']),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                      } else {
-                        String errMessage =
-                            response['message'] ?? "Terjadi kesalahan";
-                        if (response['errors'] != null) {
-                          errMessage = "Isian form tidak valid.";
-                        }
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(errMessage),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text("Error: $e"),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  }
-                }
-              },
-              child: const Text("Submit Report"),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    final pageTitle = widget.userId != null ? 'User Profile' : 'My Profile';
+    final isMyProfile = widget.userId == null;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(pageTitle),
+        title: Text(isMyProfile ? 'My Profile' : 'User Profile'),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0.5,
       ),
-      drawer: widget.userId == null ? const LeftDrawer() : null,
-      body: FutureBuilder<Map<String, dynamic>>(
-        future: _dataFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Text("Data tidak ditemukan"));
-          }
+      drawer: isMyProfile ? const LeftDrawer() : null,
 
-          final UserProfile user = snapshot.data!['profile'];
-          final List<NewsEntry> newsList = snapshot.data!['news'];
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: FutureBuilder<Map<String, dynamic>>(
+          future: _futureData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          String? currentUser = request.jsonData['username'];
-          String? currentRole = request.jsonData['role'];
-          bool isAdmin = currentRole == "admin";
-          bool isOwner =
-              widget.userId == null ||
-              (currentUser != null && user.username == currentUser);
+            if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            }
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 24,
-                    horizontal: 16,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage:
-                                () {
-                                      String url = user.profilePictureUrl;
+            if (!snapshot.hasData) {
+              return const Center(child: Text("Tidak ada data."));
+            }
 
-                                      if (url.isEmpty) {
-                                        return const AssetImage(
-                                          'images/default_profile_picture.jpg',
-                                        );
-                                      }
+            final UserProfile user = snapshot.data!['user'];
+            final List<NewsEntry> newsList = snapshot.data!['news'];
 
-                                      if (url.startsWith('http')) {
-                                        return CachedNetworkImageProvider(
-                                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}',
-                                        );
-                                      } else {
-                                        if (!url.startsWith('/')) url = '/$url';
+            String? currentUser = request.jsonData['username'];
+            bool isOwner = isMyProfile || (currentUser == user.username);
+            bool isAdmin = request.jsonData['role'] == "admin";
 
-                                        return CachedNetworkImageProvider(
-                                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url',
-                                        );
-                                      }
-                                    }()
-                                    as ImageProvider,
-
-                            onBackgroundImageError: (_, __) {
-                              print(
-                                "Gagal load image: ${user.profilePictureUrl}",
-                              );
-                            },
-                          ),
-
-                          // edit klo owner
-                          if (isOwner)
-                            Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 2,
-                                    color: Colors.black26,
-                                  ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.blueAccent,
-                                  size: 20,
-                                ),
-                                onPressed: () async {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          EditProfilePage(user: user),
-                                    ),
-                                  );
-                                  if (result == true) {
-                                    setState(() {
-                                      final request = context
-                                          .read<CookieRequest>();
-                                      _dataFuture = fetchProfileAndNews(
-                                        request,
-                                      );
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
-
-                          // tombol report
-                          if (!isOwner)
-                            Container(
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    blurRadius: 2,
-                                    color: Colors.black26,
-                                  ),
-                                ],
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.flag,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                tooltip: "Report User",
-                                onPressed: () {
-                                  final request = context.read<CookieRequest>();
-                                  _showReportDialog(
-                                    context,
-                                    user.id,
-                                    user.username,
-                                  );
-                                },
-                              ),
-                            ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // full name
-                      Text(
-                        user.fullName,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      // username ama role
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "@${user.username}",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.red[600],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              user.role.toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // join kapan ama strike brp
-                      const Divider(),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildStatColumn(
-                            "Joined",
-                            _formatDate(DateTime.parse(user.dateJoined)),
-                          ),
-                          Container(
-                            height: 30,
-                            width: 1,
-                            color: Colors.grey[300],
-                          ),
-                          if (isOwner || isAdmin)
-                            _buildStatColumn("Strikes", "${user.strikes}"),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // about
-                _buildSectionTitle("About"),
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    user.bio.isNotEmpty
-                        ? user.bio
-                        : "This user has not added a bio yet.",
-                    style: TextStyle(
-                      color: Colors.grey[800],
-                      height: 1.5,
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                // list news dia
-                _buildSectionTitle("News by @${user.username}"),
-                const SizedBox(height: 12),
-
-                if (newsList.isEmpty)
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                   Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
                     ),
                     child: Column(
                       children: [
-                        Icon(
-                          Icons.newspaper,
-                          size: 40,
-                          color: Colors.grey[300],
+                        Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.grey[200],
+                              backgroundImage: () {
+                                String url = user.profilePictureUrl;
+                                if (url.isEmpty) return const AssetImage('images/default_profile_picture.jpg');
+                                if (url.startsWith('http')) {
+                                  return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}');
+                                } else {
+                                  if (!url.startsWith('/')) url = '/$url';
+                                  return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url');
+                                }
+                              }() as ImageProvider,
+                            ),
+                            if (isOwner)
+                              GestureDetector(
+                                onTap: () async {
+                                  final res = await Navigator.push(context, MaterialPageRoute(builder: (c) => EditProfilePage(user: user)));
+                                  if (res == true) _refreshData();
+                                },
+                                child: const CircleAvatar(backgroundColor: Colors.white, radius: 18, child: Icon(Icons.edit, size: 18, color: Colors.blue)),
+                              ),
+                            if (!isOwner)
+                              GestureDetector(
+                                onTap: () => _showReportDialog(context, user.id, user.username),
+                                child: const CircleAvatar(backgroundColor: Colors.white, radius: 18, child: Icon(Icons.flag, size: 18, color: Colors.red)),
+                              ),
+                          ],
                         ),
+                        const SizedBox(height: 16),
+                        Text(user.fullName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
-                        const Text(
-                          "Belum ada berita.",
-                          style: TextStyle(color: Colors.grey),
+                        Text("@${user.username} • ${user.role.toUpperCase()}", style: TextStyle(color: Colors.grey[600])),
+                        const Divider(height: 30),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildStat("Joined", _formatDate(DateTime.parse(user.dateJoined))),
+                            if (isOwner || isAdmin) ...[
+                              Container(height: 30, width: 1, color: Colors.grey[300]),
+                              _buildStat("Strikes", "${user.strikes}"),
+                            ]
+                          ],
                         ),
                       ],
                     ),
-                  )
-                else
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: newsList.length,
-                    itemBuilder: (context, index) {
-                      final news = newsList[index];
-
-                      // thumbnail
-                      String thumbnailUrl = "";
-                      if (news.thumbnail.isNotEmpty &&
-                          !news.thumbnail.contains("default")) {
-                        if (news.thumbnail.startsWith('http')) {
-                          thumbnailUrl = news.thumbnail.replaceAll(
-                            'localhost',
-                            'localhost',
-                          );
-                        } else {
-                          thumbnailUrl =
-                              'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id${news.thumbnail}';
-                        }
-                      }
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 6,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          clipBehavior: Clip.antiAlias,
-                          child: InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    NewsDetailPage(news: news),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ListTile(
-                                  contentPadding: const EdgeInsets.all(12),
-                                  leading: Container(
-                                    width: 70,
-                                    height: 70,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(12),
-                                      image: thumbnailUrl.isNotEmpty
-                                          ? DecorationImage(
-                                              image: NetworkImage(thumbnailUrl),
-                                              fit: BoxFit.cover,
-                                            )
-                                          : null,
-                                    ),
-                                    child: thumbnailUrl.isEmpty
-                                        ? const Icon(
-                                            Icons.article,
-                                            color: Colors.grey,
-                                          )
-                                        : null,
-                                  ),
-                                  title: Text(
-                                    news.title,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                    ),
-                                  ),
-                                  subtitle: Padding(
-                                    padding: const EdgeInsets.only(top: 6.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 3,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue[50],
-                                            borderRadius: BorderRadius.circular(
-                                              6,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            news.category,
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.blue[800],
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          _formatDate(news.createdAt),
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[500],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
                   ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+                  const SizedBox(height: 24),
 
-  Widget _buildSectionTitle(String title) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: 8),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.red, width: 3)),
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                          bottom: BorderSide(
+                            color: Colors.red,
+                            width: 3.0,
+                          )
+                      ),
+                    ),
+                    child: const Text("About", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                    child: Text(user.bio.isNotEmpty ? user.bio : "No bio yet.", style: TextStyle(color: Colors.grey[800])),
+                  ),
+                  const SizedBox(height: 24),
+
+                  Container(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: Colors.red,
+                          width: 3.0,
+                        )
+                      ),
+                    ),
+                    child: Text("News by @${user.username}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
+
+                  const SizedBox(height: 8),
+                  if (newsList.isEmpty)
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                      child: const Center(child: Text("Belum ada berita.", style: TextStyle(color: Colors.grey))),
+                    )
+                  else
+                    Column(
+                      children: newsList.map((news) {
+                        String thumb = "";
+                        if (news.thumbnail.isNotEmpty && !news.thumbnail.contains("default")) {
+                          thumb = news.thumbnail.startsWith('http') ? news.thumbnail : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id${news.thumbnail}';
+                        }
+                        return Card(
+                          color: Colors.white,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: ListTile(
+                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c) => NewsDetailPage(news: news))),
+                            leading: Container(
+                              width: 60, height: 60,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200], borderRadius: BorderRadius.circular(8),
+                                image: thumb.isNotEmpty ? DecorationImage(image: NetworkImage(thumb), fit: BoxFit.cover) : null,
+                              ),
+                              child: thumb.isEmpty ? const Icon(Icons.article, color: Colors.grey) : null,
+                            ),
+                            title: Text(news.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                            subtitle: Text("${news.category} • ${_formatDate(news.createdAt)}"),
+                          ),
+                        );
+                      }).toList(),
+                    )
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildStatColumn(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
-      ],
-    );
+  Widget _buildStat(String label, String value) {
+    return Column(children: [
+      Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+    ]);
   }
 }

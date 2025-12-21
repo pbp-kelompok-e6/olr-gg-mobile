@@ -18,7 +18,6 @@ class AdminEditUserPage extends StatefulWidget {
 
 class _AdminEditUserPageState extends State<AdminEditUserPage> {
   final _formKey = GlobalKey<FormState>();
-  bool _isLoading = false;
 
   late TextEditingController _usernameController;
   late TextEditingController _firstNameController;
@@ -29,20 +28,18 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
   String? _selectedRole;
   final List<String> _roleOptions = ['reader', 'writer', 'admin'];
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
     final data = widget.initialData;
 
     _usernameController = TextEditingController(text: data['username'] ?? '');
-    _firstNameController = TextEditingController(
-      text: data['first_name'] ?? '',
-    );
+    _firstNameController = TextEditingController(text: data['first_name'] ?? '');
     _lastNameController = TextEditingController(text: data['last_name'] ?? '');
     _bioController = TextEditingController(text: data['bio'] ?? '');
-    _strikesController = TextEditingController(
-      text: (data['strikes'] ?? 0).toString(),
-    );
+    _strikesController = TextEditingController(text: (data['strikes'] ?? 0).toString());
 
     String initialRole = data['role'] ?? 'reader';
     if (_roleOptions.contains(initialRole)) {
@@ -62,51 +59,40 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
     super.dispose();
   }
 
-  Future<void> _submitForm(CookieRequest request) async {
+  Future<void> _simpanPerubahan(CookieRequest request) async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
-    final String url =
-        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/edit-user/${widget.userId}/";
-
     try {
-      final response = await request.post(url, {
-        'username': _usernameController.text,
-        'role': _selectedRole ?? 'reader',
-        'strikes': _strikesController.text,
-        'first_name': _firstNameController.text,
-        'last_name': _lastNameController.text,
-        'bio': _bioController.text,
-      });
+      final response = await request.post(
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/edit-user/${widget.userId}/",
+        {
+          'username': _usernameController.text,
+          'role': _selectedRole ?? 'reader',
+          'strikes': _strikesController.text,
+          'first_name': _firstNameController.text,
+          'last_name': _lastNameController.text,
+          'bio': _bioController.text,
+        },
+      );
 
       if (response['status'] == 'success') {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("User berhasil diupdate!")),
+            const SnackBar(content: Text("Berhasil update user!")),
           );
           Navigator.pop(context, true);
         }
       } else {
         if (mounted) {
-          String msg = "Gagal menyimpan update.";
-          if (response['errors'] != null) {
-            msg = "Error: ${response['errors']}";
-          } else if (response['message'] != null) {
-            msg = response['message'];
-          }
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(msg), backgroundColor: Colors.red),
+            SnackBar(content: Text(response['message'] ?? "Gagal update.")),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Terjadi kesalahan: $e"),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text("Error koneksi: $e")),
         );
       }
     } finally {
@@ -120,7 +106,7 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Admin: Edit User'),
+        title: const Text('Edit User'),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),
@@ -131,94 +117,67 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Edit Data User",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo,
-                ),
-              ),
-              const SizedBox(height: 20),
-
               TextFormField(
                 controller: _usernameController,
                 decoration: const InputDecoration(
                   labelText: "Username",
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person),
                 ),
-                validator: (val) =>
-                    val == null || val.isEmpty ? "Username wajib diisi" : null,
+                validator: (value) {
+                  if (value == null || value.isEmpty) return "Username tidak boleh kosong";
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: DropdownButtonFormField<String>(
-                      value: _selectedRole,
-                      decoration: const InputDecoration(
-                        labelText: "Role",
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.security),
-                      ),
-                      items: _roleOptions.map((role) {
-                        return DropdownMenuItem(
-                          value: role,
-                          child: Text(role.toUpperCase()),
-                        );
-                      }).toList(),
-                      onChanged: (val) => setState(() => _selectedRole = val),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    flex: 1,
-                    child: TextFormField(
-                      controller: _strikesController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: "Strikes",
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) {
-                        if (val == null || val.isEmpty) return "Wajib";
-                        if (int.tryParse(val) == null) return "Angka";
-                        return null;
-                      },
-                    ),
-                  ),
-                ],
+              DropdownButtonFormField<String>(
+                value: _selectedRole,
+                decoration: const InputDecoration(
+                  labelText: "Role",
+                  border: OutlineInputBorder(),
+                ),
+                items: _roleOptions.map((role) {
+                  return DropdownMenuItem(
+                    value: role,
+                    child: Text(role.toUpperCase()),
+                  );
+                }).toList(),
+                onChanged: (val) => setState(() => _selectedRole = val),
               ),
               const SizedBox(height: 16),
 
+              TextFormField(
+                controller: _strikesController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Jumlah Strikes",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return "Tidak boleh kosong";
+                  if (int.tryParse(value) == null) return "Harus berupa angka";
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
               const Divider(),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _firstNameController,
-                      decoration: const InputDecoration(
-                        labelText: "First Name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _lastNameController,
-                      decoration: const InputDecoration(
-                        labelText: "Last Name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                ],
+              TextFormField(
+                controller: _firstNameController,
+                decoration: const InputDecoration(
+                  labelText: "First Name",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              TextFormField(
+                controller: _lastNameController,
+                decoration: const InputDecoration(
+                  labelText: "Last Name",
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 16),
 
@@ -228,7 +187,6 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
                 decoration: const InputDecoration(
                   labelText: "Bio",
                   border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
                 ),
               ),
 
@@ -236,29 +194,16 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
               SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.indigo,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
                   ),
-                  onPressed: _isLoading ? null : () => _submitForm(request),
+                  onPressed: _isLoading ? null : () => _simpanPerubahan(request),
                   child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(color: Colors.white),
-                        )
-                      : const Text(
-                          "Save Changes",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("Simpan Perubahan"),
                 ),
               ),
             ],

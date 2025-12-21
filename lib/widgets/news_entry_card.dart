@@ -316,7 +316,7 @@ class NewsEntryCard extends StatelessWidget {
                                   );
                                   if (shouldDelete != true) return;
                                   final response = await request.post(
-                                    "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/${news.id}/delete-flutter/",
+                                    "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/news/${news.id}/delete-flutter/",
                                     {},
                                   );
                                   if (response['success'] == true) {

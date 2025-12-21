@@ -419,6 +419,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             subtitle: Text(
                               "${news.category} • ${_formatDate(news.createdAt)}",
                             ),
+                            title: Text(news.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                            subtitle: Text("${news.category} • ${_formatDate(news.createdAt)}"),
                           ),
                         );
                       }).toList(),

@@ -245,6 +245,14 @@ class _NewsDetailPageState extends State<NewsDetailPage> {
                           ),
                         ],
                       ),
+                    ],
+                  ),
+                ),
+                if (news.thumbnail.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
                     ),
                     Container(
                       width: double.infinity,

@@ -9,8 +9,9 @@ import 'dart:convert';
 
 class RatingsSection extends StatefulWidget {
   final String newsId;
+  final VoidCallback? onRatingChanged;
 
-  const RatingsSection({super.key, required this.newsId});
+  const RatingsSection({super.key, required this.newsId, this.onRatingChanged});
 
   @override
   State<RatingsSection> createState() => _RatingsSectionState();
@@ -50,6 +51,7 @@ class _RatingsSectionState extends State<RatingsSection> {
             const SnackBar(content: Text("Rating berhasil dihapus")),
           );
           setState(() {}); // Refresh the list
+          widget.onRatingChanged?.call();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -86,6 +88,7 @@ class _RatingsSectionState extends State<RatingsSection> {
 
     if (result == true) {
       setState(() {}); // Refresh the list
+      widget.onRatingChanged?.call();
     }
   }
 

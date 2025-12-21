@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:olrggmobile/comments/models/comment_entry.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
-
+import 'package:olrggmobile/users/screens/profile_page.dart';
 
 class CommentEntryCard extends StatefulWidget {
   final CommentEntry comment;
@@ -69,8 +69,20 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     final hour = date.hour.toString().padLeft(2, '0');
     final minute = date.minute.toString().padLeft(2, '0');
     return '${months[date.month - 1]} ${date.day}, ${date.year} at $hour:$minute';
@@ -109,13 +121,27 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                   border: Border.all(color: Colors.grey.shade300, width: 2),
                 ),
                 child: Center(
-                  child: Text(
-                    (widget.comment.userUsername ?? 'A').substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                  child: InkWell(
+                    child: Text(
+                      (widget.comment.userUsername ?? 'A')
+                          .substring(0, 1)
+                          .toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
                     ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                            userId: widget.comment.userId.toString(),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -126,18 +152,33 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          widget.comment.userUsername ?? 'Anonymous',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
-                            color: Colors.black87,
+                        InkWell(
+                          child: Text(
+                            widget.comment.userUsername ?? 'Anonymous',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                              color: Colors.black87,
+                            ),
                           ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ProfilePage(
+                                  userId: widget.comment.userId.toString(),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                         if (widget.comment.userRole == 'admin') ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.red.shade600,
                               borderRadius: BorderRadius.circular(12),
@@ -155,7 +196,10 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                         if (widget.comment.userRole == 'writer') ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.blue.shade600,
                               borderRadius: BorderRadius.circular(12),
@@ -203,7 +247,11 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                   children: [
                     TextButton.icon(
                       onPressed: _startEditing,
-                      icon: const Icon(Icons.edit_outlined, size: 16, color: Colors.blue),
+                      icon: const Icon(
+                        Icons.edit_outlined,
+                        size: 16,
+                        color: Colors.blue,
+                      ),
                       label: const Text(
                         'Edit',
                         style: TextStyle(
@@ -228,11 +276,16 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                             return Dialog(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: Colors.grey.shade200, width: 2),
+                                side: BorderSide(
+                                  color: Colors.grey.shade200,
+                                  width: 2,
+                                ),
                               ),
                               child: Container(
                                 padding: const EdgeInsets.all(24),
-                                constraints: const BoxConstraints(maxWidth: 384),
+                                constraints: const BoxConstraints(
+                                  maxWidth: 384,
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
@@ -282,13 +335,19 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                                       children: [
                                         Expanded(
                                           child: ElevatedButton(
-                                            onPressed: () => Navigator.pop(context, true),
+                                            onPressed: () =>
+                                                Navigator.pop(context, true),
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red.shade600,
+                                              backgroundColor:
+                                                  Colors.red.shade600,
                                               foregroundColor: Colors.white,
-                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                  ),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                               elevation: 0,
                                             ),
@@ -304,16 +363,21 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: OutlinedButton(
-                                            onPressed: () => Navigator.pop(context, false),
+                                            onPressed: () =>
+                                                Navigator.pop(context, false),
                                             style: OutlinedButton.styleFrom(
                                               foregroundColor: Colors.black87,
-                                              padding: const EdgeInsets.symmetric(vertical: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 12,
+                                                  ),
                                               side: BorderSide(
                                                 color: Colors.grey.shade300,
                                                 width: 2,
                                               ),
                                               shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
                                             ),
                                             child: const Text(
@@ -338,7 +402,11 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
                           widget.onDelete?.call();
                         }
                       },
-                      icon: const Icon(Icons.delete, size: 16, color: Colors.red),
+                      icon: const Icon(
+                        Icons.delete,
+                        size: 16,
+                        color: Colors.red,
+                      ),
                       label: const Text(
                         'Delete',
                         style: TextStyle(
@@ -362,85 +430,103 @@ class _CommentEntryCardState extends State<CommentEntryCard> {
             padding: const EdgeInsets.only(left: 52),
             child: _isEditing
                 ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextFormField(
-                  controller: _editController,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        controller: _editController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 2,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(
+                              color: Colors.grey.shade300,
+                              width: 2,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Colors.blue,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: _saveEdit,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue.shade600,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              elevation: 3,
+                            ),
+                            child: const Text(
+                              'Save',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton(
+                            onPressed: _cancelEdit,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.black87,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              side: BorderSide(
+                                color: Colors.grey.shade300,
+                                width: 2,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  )
+                : Text(
+                    widget.comment.content,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 14,
+                      height: 1.5,
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: _saveEdit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue.shade600,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 3,
-                      ),
-                      child: const Text(
-                        'Save',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    OutlinedButton(
-                      onPressed: _cancelEdit,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.black87,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        side: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 2,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            )
-                : Text(
-              widget.comment.content,
-              style: const TextStyle(
-                color: Colors.black87,
-                fontSize: 14,
-                height: 1.5,
-              ),
-            ),
           ),
         ],
       ),

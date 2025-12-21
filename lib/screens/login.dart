@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: InputDecoration(
                             hintText: 'Enter your username',
                             prefixIcon: const Icon(
-                              Icons.app_registration,
+                              Icons.person_outline,
                               color: Color(0xFF9ca3af),
                             ),
                             filled: true,

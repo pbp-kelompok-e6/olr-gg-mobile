@@ -8,9 +8,8 @@ class ItemHomepage {
   final String imageUrl;
   final String category;
 
-  ItemHomepage(this.title, this.description, this.imageUrl, this.category,);
+  ItemHomepage(this.title, this.description, this.imageUrl, this.category);
 }
-
 
 class ItemCard extends StatefulWidget {
   final ItemHomepage item;
@@ -33,9 +32,8 @@ class _ItemCardState extends State<ItemCard> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => NewsEntryListPage(
-              category: widget.item.category,
-            ),
+            builder: (context) =>
+                NewsEntryListPage(category: widget.item.category),
           ),
         );
       },
@@ -49,14 +47,13 @@ class _ItemCardState extends State<ItemCard> {
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(color: Colors.grey.shade700),
           ),
+          clipBehavior: Clip.antiAlias,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+              Expanded(
                 child: Image.network(
                   widget.item.imageUrl,
-                  height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),

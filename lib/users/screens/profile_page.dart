@@ -10,7 +10,7 @@ import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'package:olrggmobile/users/screens/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final int? userId;
+  final String? userId;
 
   const ProfilePage({super.key, this.userId});
 
@@ -47,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
     final user = UserProfile.fromJson(responseProfile['data']);
     final responseNews = await request.get(
-        '$baseUrl/users/load_news/?id=${user.id}&type=json'
+      '$baseUrl/users/load_news/?id=${user.id}&type=json',
     );
 
     List<NewsEntry> newsList = [];
@@ -57,10 +57,7 @@ class _ProfilePageState extends State<ProfilePage> {
       }
     }
 
-    return {
-      'user': user,
-      'news': newsList,
-    };
+    return {'user': user, 'news': newsList};
   }
 
   Future<void> _refreshData() async {
@@ -71,7 +68,11 @@ class _ProfilePageState extends State<ProfilePage> {
     await _futureData;
   }
 
-  void _showReportDialog(BuildContext context, String targetId, String username) {
+  void _showReportDialog(
+    BuildContext context,
+    String targetId,
+    String username,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -79,14 +80,20 @@ class _ProfilePageState extends State<ProfilePage> {
         content: Form(
           key: _formKey,
           child: TextFormField(
-            decoration: const InputDecoration(labelText: "Alasan", border: OutlineInputBorder()),
+            decoration: const InputDecoration(
+              labelText: "Alasan",
+              border: OutlineInputBorder(),
+            ),
             maxLines: 3,
             validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
             onSaved: (v) => _reportReason = v!,
           ),
         ),
         actions: [
-          TextButton(child: const Text("Batal"), onPressed: () => Navigator.pop(context)),
+          TextButton(
+            child: const Text("Batal"),
+            onPressed: () => Navigator.pop(context),
+          ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
@@ -96,24 +103,43 @@ class _ProfilePageState extends State<ProfilePage> {
                 final request = context.read<CookieRequest>();
                 try {
                   final response = await request.post(
-                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/report_user/$targetId/',
-                      {'reason': _reportReason}
+                    'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/report_user/$targetId/',
+                    {'reason': _reportReason},
                   );
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
+                  if (mounted)
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(response['message'])),
+                    );
                 } catch (e) {
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+                  if (mounted)
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text("Error: $e")));
                 }
               }
             },
             child: const Text("Lapor", style: TextStyle(color: Colors.white)),
-          )
+          ),
         ],
       ),
     );
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
@@ -163,11 +189,19 @@ class _ProfilePageState extends State<ProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 24,
+                      horizontal: 16,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                        ),
+                      ],
                     ),
                     child: Column(
                       children: [
@@ -177,45 +211,97 @@ class _ProfilePageState extends State<ProfilePage> {
                             CircleAvatar(
                               radius: 50,
                               backgroundColor: Colors.grey[200],
-                              backgroundImage: () {
-                                String url = user.profilePictureUrl;
-                                if (url.isEmpty) return const AssetImage('images/default_profile_picture.jpg');
-                                if (url.startsWith('http')) {
-                                  return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}');
-                                } else {
-                                  if (!url.startsWith('/')) url = '/$url';
-                                  return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url');
-                                }
-                              }() as ImageProvider,
+                              backgroundImage:
+                                  () {
+                                        String url = user.profilePictureUrl;
+                                        if (url.isEmpty)
+                                          return const AssetImage(
+                                            'images/default_profile_picture.jpg',
+                                          );
+                                        if (url.startsWith('http')) {
+                                          return CachedNetworkImageProvider(
+                                            'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}',
+                                          );
+                                        } else {
+                                          if (!url.startsWith('/'))
+                                            url = '/$url';
+                                          return CachedNetworkImageProvider(
+                                            'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url',
+                                          );
+                                        }
+                                      }()
+                                      as ImageProvider,
                             ),
                             if (isOwner)
                               GestureDetector(
                                 onTap: () async {
-                                  final res = await Navigator.push(context, MaterialPageRoute(builder: (c) => EditProfilePage(user: user)));
+                                  final res = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (c) =>
+                                          EditProfilePage(user: user),
+                                    ),
+                                  );
                                   if (res == true) _refreshData();
                                 },
-                                child: const CircleAvatar(backgroundColor: Colors.white, radius: 18, child: Icon(Icons.edit, size: 18, color: Colors.blue)),
+                                child: const CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 18,
+                                  child: Icon(
+                                    Icons.edit,
+                                    size: 18,
+                                    color: Colors.blue,
+                                  ),
+                                ),
                               ),
                             if (!isOwner)
                               GestureDetector(
-                                onTap: () => _showReportDialog(context, user.id, user.username),
-                                child: const CircleAvatar(backgroundColor: Colors.white, radius: 18, child: Icon(Icons.flag, size: 18, color: Colors.red)),
+                                onTap: () => _showReportDialog(
+                                  context,
+                                  user.id,
+                                  user.username,
+                                ),
+                                child: const CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 18,
+                                  child: Icon(
+                                    Icons.flag,
+                                    size: 18,
+                                    color: Colors.red,
+                                  ),
+                                ),
                               ),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        Text(user.fullName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                        Text(
+                          user.fullName,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         const SizedBox(height: 8),
-                        Text("@${user.username} • ${user.role.toUpperCase()}", style: TextStyle(color: Colors.grey[600])),
+                        Text(
+                          "@${user.username} • ${user.role.toUpperCase()}",
+                          style: TextStyle(color: Colors.grey[600]),
+                        ),
                         const Divider(height: 30),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            _buildStat("Joined", _formatDate(DateTime.parse(user.dateJoined))),
+                            _buildStat(
+                              "Joined",
+                              _formatDate(DateTime.parse(user.dateJoined)),
+                            ),
                             if (isOwner || isAdmin) ...[
-                              Container(height: 30, width: 1, color: Colors.grey[300]),
+                              Container(
+                                height: 30,
+                                width: 1,
+                                color: Colors.grey[300],
+                              ),
                               _buildStat("Strikes", "${user.strikes}"),
-                            ]
+                            ],
                           ],
                         ),
                       ],
@@ -227,21 +313,30 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     decoration: const BoxDecoration(
                       border: Border(
-                          bottom: BorderSide(
-                            color: Colors.red,
-                            width: 3.0,
-                          )
+                        bottom: BorderSide(color: Colors.red, width: 3.0),
                       ),
                     ),
-                    child: const Text("About", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "About",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                    child: Text(user.bio.isNotEmpty ? user.bio : "No bio yet.", style: TextStyle(color: Colors.grey[800])),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      user.bio.isNotEmpty ? user.bio : "No bio yet.",
+                      style: TextStyle(color: Colors.grey[800]),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -249,48 +344,85 @@ class _ProfilePageState extends State<ProfilePage> {
                     padding: const EdgeInsets.only(bottom: 8.0),
                     decoration: const BoxDecoration(
                       border: Border(
-                        bottom: BorderSide(
-                          color: Colors.red,
-                          width: 3.0,
-                        )
+                        bottom: BorderSide(color: Colors.red, width: 3.0),
                       ),
                     ),
-                    child: Text("News by @${user.username}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      "News by @${user.username}",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
 
                   const SizedBox(height: 8),
                   if (newsList.isEmpty)
                     Container(
                       padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                      child: const Center(child: Text("Belum ada berita.", style: TextStyle(color: Colors.grey))),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Belum ada berita.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
                     )
                   else
                     Column(
                       children: newsList.map((news) {
                         String thumb = "";
-                        if (news.thumbnail.isNotEmpty && !news.thumbnail.contains("default")) {
-                          thumb = news.thumbnail.startsWith('http') ? news.thumbnail : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id${news.thumbnail}';
+                        if (news.thumbnail.isNotEmpty &&
+                            !news.thumbnail.contains("default")) {
+                          thumb = news.thumbnail.startsWith('http')
+                              ? news.thumbnail
+                              : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id${news.thumbnail}';
                         }
                         return Card(
                           color: Colors.white,
                           margin: const EdgeInsets.only(bottom: 16),
                           child: ListTile(
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (c) => NewsDetailPage(news: news))),
-                            leading: Container(
-                              width: 60, height: 60,
-                              decoration: BoxDecoration(
-                                color: Colors.grey[200], borderRadius: BorderRadius.circular(8),
-                                image: thumb.isNotEmpty ? DecorationImage(image: NetworkImage(thumb), fit: BoxFit.cover) : null,
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (c) => NewsDetailPage(news: news),
                               ),
-                              child: thumb.isEmpty ? const Icon(Icons.article, color: Colors.grey) : null,
                             ),
-                            title: Text(news.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                            subtitle: Text("${news.category} • ${_formatDate(news.createdAt)}"),
+                            leading: Container(
+                              width: 60,
+                              height: 60,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                                image: thumb.isNotEmpty
+                                    ? DecorationImage(
+                                        image: NetworkImage(thumb),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                              ),
+                              child: thumb.isEmpty
+                                  ? const Icon(
+                                      Icons.article,
+                                      color: Colors.grey,
+                                    )
+                                  : null,
+                            ),
+                            title: Text(
+                              news.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            subtitle: Text(
+                              "${news.category} • ${_formatDate(news.createdAt)}",
+                            ),
                           ),
                         );
                       }).toList(),
-                    )
+                    ),
                 ],
               ),
             );
@@ -301,9 +433,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildStat(String label, String value) {
-    return Column(children: [
-      Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-      Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-    ]);
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+      ],
+    );
   }
 }

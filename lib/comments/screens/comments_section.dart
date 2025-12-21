@@ -15,7 +15,6 @@ class CommentsSection extends StatefulWidget {
   CommentsSectionState createState() => CommentsSectionState();
 }
 
-
 class CommentsSectionState extends State<CommentsSection> {
   final ValueNotifier<List<CommentEntry>> _commentsNotifier = ValueNotifier([]);
   bool _isLoading = true;
@@ -35,7 +34,9 @@ class CommentsSectionState extends State<CommentsSection> {
   Future<void> _loadComments() async {
     try {
       final response = await http.get(
-          Uri.parse('http://localhost:8000/comments/${widget.newsId}/json/')
+        Uri.parse(
+          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/comments/${widget.newsId}/json/',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -43,9 +44,9 @@ class CommentsSectionState extends State<CommentsSection> {
         final comments = body
             .map((dynamic item) => CommentEntry.fromJson(item))
             .toList();
-            comments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        comments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-            _commentsNotifier.value = comments;
+        _commentsNotifier.value = comments;
         if (mounted) {
           setState(() => _isLoading = false);
         }
@@ -102,10 +103,7 @@ class CommentsSectionState extends State<CommentsSection> {
                 child: Center(
                   child: Column(
                     children: [
-                      Text(
-                        '💬',
-                        style: TextStyle(fontSize: 48),
-                      ),
+                      Text('💬', style: TextStyle(fontSize: 48)),
                       const SizedBox(height: 12),
                       const Text(
                         'No comments yet',
@@ -142,7 +140,7 @@ class CommentsSectionState extends State<CommentsSection> {
                       final request = context.read<CookieRequest>();
                       try {
                         final response = await request.postJson(
-                          'http://localhost:8000/comments/${c.id}/edit_flutter/',
+                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/comments/${c.id}/edit_flutter/',
                           jsonEncode({'content': newContent}),
                         );
 
@@ -179,8 +177,8 @@ class CommentsSectionState extends State<CommentsSection> {
                       final request = context.read<CookieRequest>();
                       try {
                         final response = await request.postJson(
-                            'http://localhost:8000/comments/${c.id}/delete_flutter/',
-                            jsonEncode({})
+                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/comments/${c.id}/delete_flutter/',
+                          jsonEncode({}),
                         );
 
                         if (mounted) {
@@ -207,12 +205,10 @@ class CommentsSectionState extends State<CommentsSection> {
                     },
                   );
                 },
-
               ),
           ],
         );
       },
     );
   }
-
 }

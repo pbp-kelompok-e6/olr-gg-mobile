@@ -20,7 +20,7 @@ class _RatingsSectionState extends State<RatingsSection> {
   Future<List<RatingEntry>> fetchRatings(CookieRequest request) async {
     try {
       final response = await request.get(
-        'http://localhost:8000/rating/json/${widget.newsId}/',
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/rating/json/${widget.newsId}/',
       );
 
       List<RatingEntry> listRatings = [];
@@ -40,7 +40,7 @@ class _RatingsSectionState extends State<RatingsSection> {
     try {
       // Use CookieRequest.post() instead of http.delete for proper authentication
       final response = await request.post(
-        "http://localhost:8000/rating/delete/$ratingId/",
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/rating/delete/$ratingId/",
         {},
       );
 
@@ -52,20 +52,26 @@ class _RatingsSectionState extends State<RatingsSection> {
           setState(() {}); // Refresh the list
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(response['message'] ?? "Gagal menghapus rating")),
+            SnackBar(
+              content: Text(response['message'] ?? "Gagal menghapus rating"),
+            ),
           );
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error menghapus rating: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error menghapus rating: $e")));
       }
     }
   }
 
-  Future<void> _navigateToForm({dynamic ratingId, int? initialRating, String? initialReview}) async {
+  Future<void> _navigateToForm({
+    dynamic ratingId,
+    int? initialRating,
+    String? initialReview,
+  }) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -91,12 +97,9 @@ class _RatingsSectionState extends State<RatingsSection> {
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.yellow.shade200,
+        // color: Colors.yellow.shade200,
         border: Border(
-          top: BorderSide(
-            color: Colors.yellow.shade600,
-            width: 2,
-          ),
+          // top: BorderSide(color: Colors.yellow.shade600, width: 2),
         ),
       ),
       child: Column(
@@ -189,4 +192,3 @@ class _RatingsSectionState extends State<RatingsSection> {
     );
   }
 }
-

@@ -41,17 +41,17 @@ class _RatingFormPageState extends State<RatingFormPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: Colors.blue[300],
+      // backgroundColor: Colors.blue[300],
       appBar: AppBar(
         title: Text(
           isEditing ? "Edit Rating" : "Add Rating",
           style: const TextStyle(
-            color: Colors.black,
+            color: Colors.grey,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
+        // backgroundColor: Colors.yellow[700],
+        // foregroundColor: Colors.black,
       ),
       body: Form(
         key: _formKey,
@@ -80,6 +80,9 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       ),
                     ),
                     Slider(
+                      activeColor: Colors.yellow[700],
+                      thumbColor: Colors.yellow[700],
+                      inactiveColor: Colors.white,
                       value: _rating.toDouble(),
                       min: 1,
                       max: 5,
@@ -159,20 +162,14 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       if (isEditing) {
                         // Edit existing rating - use CookieRequest.post() for proper authentication
                         response = await request.post(
-                          "http://localhost:8000/rating/edit/${widget.ratingId}/",
-                          {
-                            "rating": _rating.toString(),
-                            "review": _review,
-                          },
+                          "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/rating/edit/${widget.ratingId}/",
+                          {"rating": _rating.toString(), "review": _review},
                         );
                       } else {
                         // Create new rating - use POST method (CookieRequest works fine)
                         response = await request.post(
-                          "http://localhost:8000/rating/add/${widget.newsId}/",
-                          {
-                            "rating": _rating.toString(),
-                            "review": _review,
-                          },
+                          "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/rating/add/${widget.newsId}/",
+                          {"rating": _rating.toString(), "review": _review},
                         );
                       }
 
@@ -192,7 +189,8 @@ class _RatingFormPageState extends State<RatingFormPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                response["message"] ?? "Gagal menyimpan rating, coba lagi.",
+                                response["message"] ??
+                                    "Gagal menyimpan rating, coba lagi.",
                               ),
                             ),
                           );
@@ -200,11 +198,9 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Error: $e"),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text("Error: $e")));
                       }
                     }
                   },
@@ -221,4 +217,3 @@ class _RatingFormPageState extends State<RatingFormPage> {
     );
   }
 }
-

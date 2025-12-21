@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 
 class MyHomePage extends StatelessWidget {
-  MyHomePage({super.key});
+  const MyHomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,9 +53,7 @@ class MyHomePage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('OLR.GG'),
-      ),
+      appBar: AppBar(title: const Text('OLR.GG')),
       drawer: LeftDrawer(),
 
       body: SingleChildScrollView(
@@ -78,7 +76,10 @@ class MyHomePage extends StatelessWidget {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 60,
+                      horizontal: 24,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -121,7 +122,10 @@ class MyHomePage extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 60,
+                      horizontal: 24,
+                    ),
                     child: Column(
                       children: [
                         LayoutBuilder(
@@ -130,23 +134,22 @@ class MyHomePage extends StatelessWidget {
                             int crossAxisCount;
                             if (width < 600) {
                               crossAxisCount = 1;
-                            }
-                            else if (width < 1000) {
+                            } else if (width < 1000) {
                               crossAxisCount = 2;
-                            }
-                            else {
+                            } else {
                               crossAxisCount = 3;
                             }
 
                             return GridView.builder(
                               shrinkWrap: true,
                               physics: const NeverScrollableScrollPhysics(),
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: crossAxisCount,
-                                crossAxisSpacing: 16,
-                                mainAxisSpacing: 16,
-                                childAspectRatio: 0.8,
-                              ),
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: crossAxisCount,
+                                    crossAxisSpacing: 16,
+                                    mainAxisSpacing: 16,
+                                    childAspectRatio: 0.8,
+                                  ),
                               itemCount: categories.length,
                               itemBuilder: (context, index) {
                                 return ItemCard(categories[index]);
@@ -162,17 +165,28 @@ class MyHomePage extends StatelessWidget {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const NewsEntryListPage()
+                                  builder: (context) =>
+                                      const NewsEntryListPage(),
                                 ),
                               );
                             },
-                            icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                            icon: const Icon(
+                              Icons.arrow_forward,
+                              color: Colors.white,
+                            ),
                             label: const Text(
                               "View All Sports News",
-                              style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 32),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                                horizontal: 32,
+                              ),
                               side: const BorderSide(color: Colors.white),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -206,7 +220,7 @@ class MyHomePage extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text(
                     "OLR.GG is your one-stop destination for sports news across Basketball, Soccer, Football, "
-                        "Hockey, Volleyball, and Baseball. Join our community to discuss, rate, and save your favorite articles.",
+                    "Hockey, Volleyball, and Baseball. Join our community to discuss, rate, and save your favorite articles.",
                     style: TextStyle(fontSize: 16, color: Colors.black54),
                     textAlign: TextAlign.center,
                   ),
@@ -235,7 +249,10 @@ class MyHomePage extends StatelessWidget {
                                   SizedBox(height: 8),
                                   Text(
                                     "Latest News",
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   SizedBox(height: 4),
                                   Text(
@@ -268,7 +285,10 @@ class MyHomePage extends StatelessWidget {
                                   SizedBox(height: 8),
                                   Text(
                                     "Community",
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   SizedBox(height: 4),
                                   Text(
@@ -301,7 +321,10 @@ class MyHomePage extends StatelessWidget {
                                   SizedBox(height: 8),
                                   Text(
                                     "Reading Lists",
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                   SizedBox(height: 4),
                                   Text(
@@ -337,32 +360,168 @@ class MyHomePage extends StatelessWidget {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: const [
-                              Text("OLR.GG", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
+                              Text(
+                                "OLR.GG",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blueAccent,
+                                ),
+                              ),
                               SizedBox(height: 4),
-                              Text("Your ultimate destination for sports news.", style: TextStyle(color: Colors.white70)),
+                              Text(
+                                "Your ultimate destination for sports news.",
+                                style: TextStyle(color: Colors.white70),
+                              ),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Quick Links", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                              const Text(
+                                "Quick Links",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                               const SizedBox(height: 8),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => const NewsEntryListPage()),);}, child: const Text("News", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {}, child: const Text("Forum", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {}, child: const Text("Reading Lists", style: TextStyle(color: Colors.white70))),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NewsEntryListPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "News",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  "Forum",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  "Reading Lists",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Sports", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                              const Text(
+                                "Sports",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                               const SizedBox(height: 8),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => NewsEntryListPage(category: "basketball",),),);}, child: const Text("Basketball", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => NewsEntryListPage(category: "soccer",),),);}, child: const Text("Soccer", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => NewsEntryListPage(category: "football",),),);}, child: const Text("Football", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => NewsEntryListPage(category: "hockey",),),);}, child: const Text("Hockey", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => NewsEntryListPage(category: "volleyball",),),);}, child: const Text("Volleyball", style: TextStyle(color: Colors.white70))),
-                              TextButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => NewsEntryListPage(category: "baseball",),),);}, child: const Text("Baseball", style: TextStyle(color: Colors.white70))),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewsEntryListPage(
+                                        category: "basketball",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Basketball",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          NewsEntryListPage(category: "soccer"),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Soccer",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewsEntryListPage(
+                                        category: "football",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Football",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          NewsEntryListPage(category: "hockey"),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Hockey",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewsEntryListPage(
+                                        category: "volleyball",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Volleyball",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => NewsEntryListPage(
+                                        category: "baseball",
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text(
+                                  "Baseball",
+                                  style: TextStyle(color: Colors.white70),
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -371,7 +530,10 @@ class MyHomePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   const Center(
-                    child: Text("© 2025 OLR.GG. All rights reserved.", style: TextStyle(color: Colors.white70)),
+                    child: Text(
+                      "© 2025 OLR.GG. All rights reserved.",
+                      style: TextStyle(color: Colors.white70),
+                    ),
                   ),
                 ],
               ),

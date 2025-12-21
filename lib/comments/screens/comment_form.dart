@@ -8,11 +8,8 @@ class CommentForm extends StatefulWidget {
   final String newsId;
   final VoidCallback? onCommentAdded; // Add callback to refresh parent
 
-  const CommentForm({
-    Key? key,
-    required this.newsId,
-    this.onCommentAdded,
-  }) : super(key: key);
+  const CommentForm({Key? key, required this.newsId, this.onCommentAdded})
+    : super(key: key);
 
   @override
   State<CommentForm> createState() => _CommentFormState();
@@ -41,9 +38,9 @@ class _CommentFormState extends State<CommentForm> {
 
       // Use request.post() instead of postJson() and include news_id
       final response = await request.post(
-        'http://localhost:8000/comments/add_comment_flutter/',
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/comments/add_comment_flutter/',
         {
-          'news_id': widget.newsId,  // Include news_id
+          'news_id': widget.newsId, // Include news_id
           'content': _commentController.text,
         },
       );
@@ -74,10 +71,7 @@ class _CommentFormState extends State<CommentForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -106,6 +100,7 @@ class _CommentFormState extends State<CommentForm> {
           children: [
             const Text(
               'Add a Comment',
+
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -114,13 +109,17 @@ class _CommentFormState extends State<CommentForm> {
             ),
             const SizedBox(height: 12),
             TextFormField(
+              cursorColor: Colors.black,
               controller: _commentController,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Share your thoughts...',
                 filled: true,
                 fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: Colors.grey.shade300, width: 2),
@@ -134,8 +133,7 @@ class _CommentFormState extends State<CommentForm> {
                   borderSide: const BorderSide(color: Colors.blue, width: 2),
                 ),
               ),
-              validator: (value) =>
-              (value == null || value.isEmpty)
+              validator: (value) => (value == null || value.isEmpty)
                   ? 'Comment cannot be empty'
                   : null,
               enabled: !_isLoading,
@@ -147,13 +145,15 @@ class _CommentFormState extends State<CommentForm> {
                 onPressed: _isLoading ? null : _submitComment,
                 icon: _isLoading
                     ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                  ),
-                )
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
                     : const Icon(Icons.send, size: 20),
                 label: const Text(
                   'Post Comment',
@@ -162,7 +162,10 @@ class _CommentFormState extends State<CommentForm> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade600,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -175,5 +178,4 @@ class _CommentFormState extends State<CommentForm> {
       ),
     );
   }
-
 }

@@ -146,9 +146,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url');
                   }
                 }() as ImageProvider,
-                onBackgroundImageError: (_, __) {
-                  print("Gagal load image: ${widget.user.profilePictureUrl}");
-                },
+                // onBackgroundImageError: (_, __) {
+                //   print("Gagal load image: ${widget.user.profilePictureUrl}");
+                // },
               ),
               const SizedBox(height: 12),
               TextButton.icon(

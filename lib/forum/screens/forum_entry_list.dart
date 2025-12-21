@@ -18,16 +18,16 @@ class ForumEntryListPage extends StatefulWidget {
 
 class _ForumEntryListPageState extends State<ForumEntryListPage> {
   late bool showOnlyMyPosts;
-  
-  String selectedCategory = 'all'; 
+
+  String selectedCategory = 'all';
   final List<String> categories = [
-    'all', 
-    'soccer', 
-    'football', 
-    'basketball', 
-    'volleyball', 
-    'hockey', 
-    'baseball'
+    'all',
+    'soccer',
+    'football',
+    'basketball',
+    'volleyball',
+    'hockey',
+    'baseball',
   ];
 
   @override
@@ -37,7 +37,9 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
   }
 
   Future<List<ForumEntry>> fetchForum(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/forum/json/');
+    final response = await request.get(
+      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/json/',
+    );
     var data = response;
     List<ForumEntry> listForum = [];
     for (var d in data) {
@@ -56,39 +58,47 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.black, 
+        backgroundColor: Colors.black,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.grey),
         title: Text(
           showOnlyMyPosts ? "My Discussions" : "Discussion Forum",
-          style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1.0),
-          child: Container(
-            color: Colors.grey[800],
-            height: 1.0,
-          ),
+          child: Container(color: Colors.grey[800], height: 1.0),
         ),
       ),
       drawer: const LeftDrawer(),
-      
-      floatingActionButton: request.loggedIn 
-        ? FloatingActionButton.extended(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ForumFormPage()),
-              );
-            },
-            label: const Text("New Discussion", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-            icon: const Icon(Icons.add, color: Colors.white),
-            backgroundColor: Colors.red[600],
-            elevation: 4,
-          )
-        : null,
-      
+
+      floatingActionButton: request.loggedIn
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ForumFormPage(),
+                  ),
+                );
+              },
+              label: const Text(
+                "New Discussion",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              icon: const Icon(Icons.add, color: Colors.white),
+              backgroundColor: Colors.red[600],
+              elevation: 4,
+            )
+          : null,
+
       body: Column(
         children: [
           if (request.loggedIn)
@@ -123,11 +133,15 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
                 final isSelected = selectedCategory == cat;
                 return ChoiceChip(
                   label: Text(
-                    cat == 'all' ? "All Categories" : cat[0].toUpperCase() + cat.substring(1),
+                    cat == 'all'
+                        ? "All Categories"
+                        : cat[0].toUpperCase() + cat.substring(1),
                     style: TextStyle(
                       fontSize: 12,
                       color: isSelected ? Colors.white : Colors.grey[700],
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                   selected: isSelected,
@@ -158,7 +172,9 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
               future: fetchForum(request),
               builder: (context, AsyncSnapshot snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Colors.red));
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.red),
+                  );
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return _buildEmptyState();
                 } else {
@@ -172,27 +188,33 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
 
                   if (selectedCategory != 'all') {
                     forumPosts = forumPosts
-                        .where((p) => p.category.toLowerCase() == selectedCategory.toLowerCase())
+                        .where(
+                          (p) =>
+                              p.category.toLowerCase() ==
+                              selectedCategory.toLowerCase(),
+                        )
                         .toList();
                   }
 
                   if (forumPosts.isEmpty) {
-                    return _buildEmptyState(message: "No discussions found in this category.");
+                    return _buildEmptyState(
+                      message: "No discussions found in this category.",
+                    );
                   }
 
                   return ListView.separated(
                     padding: const EdgeInsets.only(top: 8, bottom: 80),
                     itemCount: forumPosts.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 0), 
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 0),
                     itemBuilder: (_, index) => ForumEntryCard(
                       forum: forumPosts[index],
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ForumDetailPage(
-                              forum: forumPosts[index],
-                            ),
+                            builder: (context) =>
+                                ForumDetailPage(forum: forumPosts[index]),
                           ),
                         );
                       },
@@ -207,7 +229,11 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
     );
   }
 
-  Widget _buildMainFilterChip(String label, bool isSelected, VoidCallback onSelected) {
+  Widget _buildMainFilterChip(
+    String label,
+    bool isSelected,
+    VoidCallback onSelected,
+  ) {
     return ChoiceChip(
       label: Text(label),
       selected: isSelected,
@@ -216,13 +242,13 @@ class _ForumEntryListPageState extends State<ForumEntryListPage> {
       backgroundColor: Colors.grey[100],
       labelStyle: TextStyle(
         color: isSelected ? Colors.white : Colors.grey[700],
-        fontWeight: FontWeight.bold
+        fontWeight: FontWeight.bold,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isSelected ? Colors.red[600]! : Colors.transparent
-        )
+          color: isSelected ? Colors.red[600]! : Colors.transparent,
+        ),
       ),
       showCheckmark: false,
     );

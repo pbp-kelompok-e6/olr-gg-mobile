@@ -8,11 +8,8 @@ class CommentForm extends StatefulWidget {
   final String newsId;
   final VoidCallback? onCommentAdded; // Add callback to refresh parent
 
-  const CommentForm({
-    Key? key,
-    required this.newsId,
-    this.onCommentAdded,
-  }) : super(key: key);
+  const CommentForm({Key? key, required this.newsId, this.onCommentAdded})
+    : super(key: key);
 
   @override
   State<CommentForm> createState() => _CommentFormState();
@@ -41,9 +38,9 @@ class _CommentFormState extends State<CommentForm> {
 
       // Use request.post() instead of postJson() and include news_id
       final response = await request.post(
-        'http://localhost:8000/comments/add_comment_flutter/',
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/comments/add_comment_flutter/',
         {
-          'news_id': widget.newsId,  // Include news_id
+          'news_id': widget.newsId, // Include news_id
           'content': _commentController.text,
         },
       );
@@ -74,10 +71,7 @@ class _CommentFormState extends State<CommentForm> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -96,10 +90,7 @@ class _CommentFormState extends State<CommentForm> {
       decoration: BoxDecoration(
         color: Colors.yellow.shade100,
         border: Border(
-          bottom: BorderSide(
-            color: Colors.yellow.shade600,
-            width: 2,
-          ),
+          bottom: BorderSide(color: Colors.yellow.shade600, width: 2),
         ),
       ),
       child: Form(
@@ -109,10 +100,7 @@ class _CommentFormState extends State<CommentForm> {
           children: [
             const Text(
               'Add a Comment',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             TextFormField(
@@ -126,8 +114,7 @@ class _CommentFormState extends State<CommentForm> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              validator: (value) =>
-              (value == null || value.isEmpty)
+              validator: (value) => (value == null || value.isEmpty)
                   ? 'Comment cannot be empty'
                   : null,
               enabled: !_isLoading,
@@ -141,13 +128,13 @@ class _CommentFormState extends State<CommentForm> {
               ),
               child: _isLoading
                   ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
                   : const Text('Submit Comment'),
             ),
           ],

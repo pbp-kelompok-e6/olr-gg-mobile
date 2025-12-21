@@ -65,6 +65,27 @@ class LeftDrawer extends StatelessWidget {
               MaterialPageRoute(builder: (_) => MyHomePage()),
             ),
           ),
+          if (request.loggedIn == false) {
+            ListTile(
+              leading: const Icon(Icons.login, color: Colors.grey),
+              title: const Text("Login", style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => LoginPage()),
+              ),
+            ),
+
+          ListTile(
+              leading: const Icon(Icons.login, color: Colors.grey),
+              title: const Text("Login", style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => LoginPage()),
+              ),
+            ),
+          }
           Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(
@@ -171,7 +192,7 @@ class LeftDrawer extends StatelessWidget {
                 ),
               ],
             ),
-          ),          
+          ),
           if (request.loggedIn) // Hanya muncul jika login
             ListTile(
               leading: const Icon(
@@ -206,26 +227,33 @@ class LeftDrawer extends StatelessWidget {
               ),
             ),
           // FORUM
-            ListTile(
-            leading: const Icon(Icons.chat, color: Colors.grey), 
-            title: const Text('Forum', style: TextStyle(color: Colors.grey)), 
-            hoverColor: Colors.white10, 
+          ListTile(
+            leading: const Icon(Icons.chat, color: Colors.grey),
+            title: const Text('Forum', style: TextStyle(color: Colors.grey)),
+            hoverColor: Colors.white10,
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ForumEntryListPage()),
+                MaterialPageRoute(
+                  builder: (context) => const ForumEntryListPage(),
+                ),
               );
             },
           ),
           if (request.loggedIn)
             ListTile(
-              leading: const Icon(Icons.add_comment, color: Colors.grey), 
-              title: const Text('Create Forum', style: TextStyle(color: Colors.grey)), 
-              hoverColor: Colors.white10, 
+              leading: const Icon(Icons.add_comment, color: Colors.grey),
+              title: const Text(
+                'Create Forum',
+                style: TextStyle(color: Colors.grey),
+              ),
+              hoverColor: Colors.white10,
               onTap: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const ForumFormPage()),
+                  MaterialPageRoute(
+                    builder: (context) => const ForumFormPage(),
+                  ),
                 );
               },
             ),
@@ -246,20 +274,21 @@ class LeftDrawer extends StatelessWidget {
                 );
               },
             ),
-          ListTile(
-            leading: const Icon(Icons.person, color: Colors.grey),
-            title: const Text(
-              'My Profile',
-              style: TextStyle(color: Colors.grey),
+          if (request.loggedIn)
+            ListTile(
+              leading: const Icon(Icons.person, color: Colors.grey),
+              title: const Text(
+                'My Profile',
+                style: TextStyle(color: Colors.grey),
+              ),
+              hoverColor: Colors.white10,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
+              },
             ),
-            hoverColor: Colors.white10,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfilePage()),
-              );
-            },
-          ),
           if (role == "admin")
             ListTile(
               leading: const Icon(
@@ -280,33 +309,36 @@ class LeftDrawer extends StatelessWidget {
                 );
               },
             ),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.grey),
-            title: const Text("Logout", style: TextStyle(color: Colors.grey)),
-            hoverColor: Colors.white10,
-            onTap: () async {
-              final response = await request.logout(
-                "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/auth/logout/",
-              );
-              String message = response["message"];
-              if (context.mounted) {
-                if (response['status']) {
-                  String uname = response["username"];
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text("$message See you again, $uname.")),
-                  );
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginPage()),
-                  );
-                } else {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(message)));
+          if (request.loggedIn)
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.grey),
+              title: const Text("Logout", style: TextStyle(color: Colors.grey)),
+              hoverColor: Colors.white10,
+              onTap: () async {
+                final response = await request.logout(
+                  "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/auth/logout/",
+                );
+                String message = response["message"];
+                if (context.mounted) {
+                  if (response['status']) {
+                    String uname = response["username"];
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("$message See you again, $uname."),
+                      ),
+                    );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LoginPage()),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(message)));
+                  }
                 }
-              }
-            },
-          ),
+              },
+            ),
         ],
       ),
     );

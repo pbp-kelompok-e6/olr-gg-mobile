@@ -317,16 +317,16 @@ class NewsDetailPage extends StatelessWidget {
                 const SizedBox(height: 16),
                 // Ratings Section
                 RatingsSection(newsId: news.id),
+
+                CommentForm(
+                  newsId: news.id,
+                  onCommentAdded: () {
+                    commentsSectionKey.currentState?.refreshComments();
+                  },
+                ),
+                CommentsSection(key: commentsSectionKey, newsId: news.id),
               ],
             ),
-            CommentForm(
-              newsId: news.id,
-              onCommentAdded: () {
-                commentsSectionKey.currentState?.refreshComments();
-              },
-            ),
-            CommentsSection(key: commentsSectionKey, newsId: news.id)
-          ],
           ),
         ),
       ),

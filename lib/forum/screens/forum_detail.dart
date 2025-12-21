@@ -22,7 +22,9 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
   final TextEditingController _commentController = TextEditingController();
 
   Future<List<ForumComment>> fetchComments(CookieRequest request) async {
-    final response = await request.get('http://localhost:8000/forum/json/comments/${widget.forum.id}/');
+    final response = await request.get(
+      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/json/comments/${widget.forum.id}/',
+    );
     List<ForumComment> listComments = [];
     for (var d in response) {
       if (d != null) listComments.add(ForumComment.fromJson(d));
@@ -31,7 +33,20 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
@@ -74,7 +89,10 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
               onTap: () => Navigator.pop(context),
               child: Container(
                 margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border.all(color: Colors.grey.shade300),
@@ -85,8 +103,13 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                   children: [
                     Icon(Icons.arrow_back, size: 16, color: Colors.grey[700]),
                     const SizedBox(width: 8),
-                    Text("Back to Forum",
-                        style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w500)),
+                    Text(
+                      "Back to Forum",
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -99,7 +122,11 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.grey.shade200),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 2, offset: const Offset(0, 1))
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 2,
+                    offset: const Offset(0, 1),
+                  ),
                 ],
               ),
               child: Column(
@@ -111,16 +138,30 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                       Expanded(
                         child: Text(
                           widget.forum.title,
-                          style: const TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: const TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.blue[800], borderRadius: BorderRadius.circular(20)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.blue[800],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                         child: Text(
                           widget.forum.category.toUpperCase(),
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue[50]),
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue[50],
+                          ),
                         ),
                       ),
                     ],
@@ -128,25 +169,39 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.calendar_today, size: 14, color: Colors.grey[500]),
+                      Icon(
+                        Icons.calendar_today,
+                        size: 14,
+                        color: Colors.grey[500],
+                      ),
                       const SizedBox(width: 4),
-                      Text(_formatDate(widget.forum.createdAt),
-                          style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                      Text(
+                        _formatDate(widget.forum.createdAt),
+                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      ),
                       const SizedBox(width: 16),
                       Icon(Icons.person, size: 14, color: Colors.grey[500]),
                       const SizedBox(width: 4),
-                      Text(widget.forum.userUsername, style: TextStyle(fontSize: 14, color: Colors.grey[500])),
+                      Text(
+                        widget.forum.userUsername,
+                        style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                      ),
                     ],
                   ),
                   const Divider(height: 32),
                   Text(
                     widget.forum.content,
-                    style: const TextStyle(fontSize: 16.0, height: 1.6, color: Colors.black87),
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      height: 1.6,
+                      color: Colors.black87,
+                    ),
                     textAlign: TextAlign.justify,
                   ),
-                  
+
                   if (widget.forum.userUsername == currentUser ||
-                      (role != null && role.toString().toLowerCase() == 'admin'))
+                      (role != null &&
+                          role.toString().toLowerCase() == 'admin'))
                     Padding(
                       padding: const EdgeInsets.only(top: 20),
                       child: Row(
@@ -156,32 +211,53 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                             TextButton.icon(
                               icon: const Icon(Icons.edit, size: 16),
                               label: const Text("Edit"),
-                              style: TextButton.styleFrom(foregroundColor: Colors.blue[700]),
+                              style: TextButton.styleFrom(
+                                foregroundColor: Colors.blue[700],
+                              ),
                               onPressed: () {
-                                Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => ForumEditPage(forum: widget.forum)));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ForumEditPage(forum: widget.forum),
+                                  ),
+                                );
                               },
                             ),
                           TextButton.icon(
                             icon: const Icon(Icons.delete, size: 16),
                             label: const Text("Delete"),
-                            style: TextButton.styleFrom(foregroundColor: Colors.red[600]),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.red[600],
+                            ),
                             onPressed: () async {
                               final shouldDelete = await showDialog<bool>(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   backgroundColor: Colors.white,
-                                  title: const Text("Delete Post?", style: TextStyle(color: Colors.black)),
-                                  content: const Text("This action cannot be undone."),
+                                  title: const Text(
+                                    "Delete Post?",
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                  content: const Text(
+                                    "This action cannot be undone.",
+                                  ),
                                   actions: [
                                     TextButton(
-                                      child: const Text("Cancel"), 
-                                      onPressed: () => Navigator.pop(context, false)
+                                      child: const Text("Cancel"),
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
                                     ),
                                     ElevatedButton(
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                      child: const Text("Delete", style: TextStyle(color: Colors.white)),
-                                      onPressed: () => Navigator.pop(context, true),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                      ),
+                                      child: const Text(
+                                        "Delete",
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
                                     ),
                                   ],
                                 ),
@@ -189,10 +265,18 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
 
                               if (shouldDelete == true) {
                                 final response = await request.post(
-                                    "http://localhost:8000/forum/ajax/delete-post/${widget.forum.id}/", {});
-                                if (context.mounted && response['status'] == 'success') {
-                                  Navigator.pushReplacement(context,
-                                      MaterialPageRoute(builder: (context) => const ForumEntryListPage()));
+                                  "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/ajax/delete-post/${widget.forum.id}/",
+                                  {},
+                                );
+                                if (context.mounted &&
+                                    response['status'] == 'success') {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ForumEntryListPage(),
+                                    ),
+                                  );
                                 }
                               }
                             },
@@ -205,7 +289,14 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
             ),
 
             const SizedBox(height: 24),
-            Text("Replies", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey[800])),
+            Text(
+              "Replies",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
             const SizedBox(height: 12),
 
             FutureBuilder<List<ForumComment>>(
@@ -218,11 +309,16 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                     padding: const EdgeInsets.all(20),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.shade200)),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
                     child: Center(
-                        child: Text("No comments yet.", style: TextStyle(color: Colors.grey[500]))),
+                      child: Text(
+                        "No comments yet.",
+                        style: TextStyle(color: Colors.grey[500]),
+                      ),
+                    ),
                   );
                 } else {
                   return ListView.builder(
@@ -245,15 +341,28 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(comment.user,
-                                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800])),
-                                Text(_formatIsoDate(comment.createdAt),
-                                    style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                                Text(
+                                  comment.user,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue[800],
+                                  ),
+                                ),
+                                Text(
+                                  _formatIsoDate(comment.createdAt),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 8),
-                            Text(comment.content, style: TextStyle(color: Colors.grey[800])),
-                            
+                            Text(
+                              comment.content,
+                              style: TextStyle(color: Colors.grey[800]),
+                            ),
+
                             if (comment.user == currentUser)
                               Align(
                                 alignment: Alignment.centerRight,
@@ -261,30 +370,46 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     TextButton(
-                                      onPressed: () => _showEditCommentDialog(context, request, comment),
+                                      onPressed: () => _showEditCommentDialog(
+                                        context,
+                                        request,
+                                        comment,
+                                      ),
                                       style: TextButton.styleFrom(
                                         foregroundColor: Colors.blue[600],
                                         padding: EdgeInsets.zero,
                                         minimumSize: const Size(0, 0),
-                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
                                       ),
-                                      child: const Text("Edit", style: TextStyle(fontSize: 12)),
+                                      child: const Text(
+                                        "Edit",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
                                     ),
-                                    const SizedBox(width: 12), 
-                                    
+                                    const SizedBox(width: 12),
+
                                     TextButton(
-                                      onPressed: () => _deleteComment(context, request, comment.id),
+                                      onPressed: () => _deleteComment(
+                                        context,
+                                        request,
+                                        comment.id,
+                                      ),
                                       style: TextButton.styleFrom(
                                         foregroundColor: Colors.red[400],
                                         padding: EdgeInsets.zero,
                                         minimumSize: const Size(0, 0),
-                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
                                       ),
-                                      child: const Text("Delete", style: TextStyle(fontSize: 12)),
+                                      child: const Text(
+                                        "Delete",
+                                        style: TextStyle(fontSize: 12),
+                                      ),
                                     ),
                                   ],
                                 ),
-                              )
+                              ),
                           ],
                         ),
                       );
@@ -300,13 +425,17 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200)),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Add a Reply", style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text(
+                      "Add a Reply",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     const SizedBox(height: 12),
                     Form(
                       key: _formKey,
@@ -318,7 +447,9 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                           filled: true,
                           fillColor: Colors.grey[50],
                           border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide.none,
+                          ),
                           contentPadding: const EdgeInsets.all(12),
                         ),
                         maxLines: 3,
@@ -332,15 +463,18 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red[600],
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             final response = await request.postJson(
-                              "http://localhost:8000/forum/ajax/create-comment/${widget.forum.id}/",
+                              "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/ajax/create-comment/${widget.forum.id}/",
                               jsonEncode({'content': _commentController.text}),
                             );
-                            if (context.mounted && response['status'] == 'success') {
+                            if (context.mounted &&
+                                response['status'] == 'success') {
                               _commentController.clear();
                               setState(() {});
                             }
@@ -359,7 +493,11 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
     );
   }
 
-  void _deleteComment(BuildContext context, CookieRequest request, int commentId) async {
+  void _deleteComment(
+    BuildContext context,
+    CookieRequest request,
+    int commentId,
+  ) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -380,13 +518,22 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
     );
 
     if (shouldDelete == true) {
-      final response = await request.post("http://localhost:8000/forum/ajax/delete-comment/$commentId/", {});
+      final response = await request.post(
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/ajax/delete-comment/$commentId/",
+        {},
+      );
       if (mounted && response['status'] == 'success') setState(() {});
     }
   }
 
-  void _showEditCommentDialog(BuildContext context, CookieRequest request, ForumComment comment) {
-    final TextEditingController _editController = TextEditingController(text: comment.content);
+  void _showEditCommentDialog(
+    BuildContext context,
+    CookieRequest request,
+    ForumComment comment,
+  ) {
+    final TextEditingController _editController = TextEditingController(
+      text: comment.content,
+    );
 
     showDialog(
       context: context,
@@ -394,9 +541,7 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
         title: const Text('Edit Comment'),
         content: TextField(
           controller: _editController,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-          ),
+          decoration: const InputDecoration(border: OutlineInputBorder()),
           maxLines: 3,
         ),
         actions: [
@@ -410,14 +555,14 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
               if (_editController.text.isEmpty) return;
 
               final response = await request.postJson(
-                "http://localhost:8000/forum/ajax/edit-comment/${comment.id}/",
+                "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/ajax/edit-comment/${comment.id}/",
                 jsonEncode({'content': _editController.text}),
               );
 
               if (context.mounted) {
                 if (response['status'] == 'success') {
                   Navigator.pop(context);
-                  setState(() {}); 
+                  setState(() {});
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Failed to edit")),

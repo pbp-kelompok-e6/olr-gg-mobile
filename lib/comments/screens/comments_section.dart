@@ -15,7 +15,6 @@ class CommentsSection extends StatefulWidget {
   CommentsSectionState createState() => CommentsSectionState();
 }
 
-
 class CommentsSectionState extends State<CommentsSection> {
   String? _editingCommentId;
   final _editFormKey = GlobalKey<FormState>();
@@ -39,7 +38,9 @@ class CommentsSectionState extends State<CommentsSection> {
   Future<void> _loadComments() async {
     try {
       final response = await http.get(
-          Uri.parse('http://localhost:8000/comments/${widget.newsId}/json/')
+        Uri.parse(
+          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/${widget.newsId}/json/',
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -47,9 +48,9 @@ class CommentsSectionState extends State<CommentsSection> {
         final comments = body
             .map((dynamic item) => CommentEntry.fromJson(item))
             .toList();
-            comments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        comments.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
-            _commentsNotifier.value = comments;
+        _commentsNotifier.value = comments;
         if (mounted) {
           setState(() => _isLoading = false);
         }
@@ -66,6 +67,7 @@ class CommentsSectionState extends State<CommentsSection> {
     _editingCommentId = null;
     _loadComments();
   }
+
   void _startEditing(CommentEntry comment) {
     setState(() {
       _editingCommentId = comment.id;
@@ -85,7 +87,7 @@ class CommentsSectionState extends State<CommentsSection> {
 
     final request = context.read<CookieRequest>();
     final response = await request.postJson(
-      'http://localhost:8000/comments/$commentId/edit_flutter/',
+      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/$commentId/edit_flutter/',
       jsonEncode({'content': _editController.text}),
     );
 
@@ -114,10 +116,7 @@ class CommentsSectionState extends State<CommentsSection> {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.yellow.shade100,
-        border: Border.all(
-          color: Colors.blue.shade600,
-          width: 2,
-        ),
+        border: Border.all(color: Colors.blue.shade600, width: 2),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Form(
@@ -130,10 +129,7 @@ class CommentsSectionState extends State<CommentsSection> {
               children: [
                 const Text(
                   'Edit Comment',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -155,8 +151,7 @@ class CommentsSectionState extends State<CommentsSection> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              validator: (value) =>
-              (value == null || value.isEmpty)
+              validator: (value) => (value == null || value.isEmpty)
                   ? 'Comment cannot be empty'
                   : null,
             ),
@@ -208,7 +203,10 @@ class CommentsSectionState extends State<CommentsSection> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 12),
-            const Text('Comments', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text(
+              'Comments',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 8),
             ListView.separated(
               shrinkWrap: true,
@@ -228,8 +226,8 @@ class CommentsSectionState extends State<CommentsSection> {
                     final request = context.read<CookieRequest>();
                     try {
                       final response = await request.postJson(
-                          'http://localhost:8000/comments/${c.id}/delete_flutter/',
-                          jsonEncode({})
+                        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/${c.id}/delete_flutter/',
+                        jsonEncode({}),
                       );
 
                       if (mounted) {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:olrggmobile/screens/login.dart';
+import 'package:olrggmobile/screens/menu.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +36,10 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.white, surface: Colors.white),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.white,
+            surface: Colors.white,
+          ),
           inputDecorationTheme: const InputDecorationTheme(
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.black),
@@ -59,7 +62,7 @@ class MyApp extends StatelessWidget {
             elevation: 2,
           ),
         ),
-        home: const LoginPage()
+        home: const MyHomePage(),
       ),
     );
   }

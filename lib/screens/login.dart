@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
                             ],
                           ),
                           child: const Icon(
-                            Icons.sports_soccer,
+                            Icons.login,
                             color: Colors.white,
                             size: 32,
                           ),
@@ -113,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
                           decoration: InputDecoration(
                             hintText: 'Enter your username',
                             prefixIcon: const Icon(
-                              Icons.person_outline,
+                              Icons.app_registration,
                               color: Color(0xFF9ca3af),
                             ),
                             filled: true,
@@ -249,33 +249,62 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Column(
                           children: [
-                            const Text(
-                              "Don't have an account? ",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const RegisterPage(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text(
+                                  "Don't have an account? ",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
                                   ),
-                                );
-                              },
-                              child: const Text(
-                                "create one now",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
                                 ),
-                              ),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const RegisterPage(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    "create one now",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const MyHomePage(),
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Continue As Guest",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),

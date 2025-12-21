@@ -159,20 +159,14 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       if (isEditing) {
                         // Edit existing rating - use CookieRequest.post() for proper authentication
                         response = await request.post(
-                          "http://localhost:8000/rating/edit/${widget.ratingId}/",
-                          {
-                            "rating": _rating.toString(),
-                            "review": _review,
-                          },
+                          "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/rating/edit/${widget.ratingId}/",
+                          {"rating": _rating.toString(), "review": _review},
                         );
                       } else {
                         // Create new rating - use POST method (CookieRequest works fine)
                         response = await request.post(
-                          "http://localhost:8000/rating/add/${widget.newsId}/",
-                          {
-                            "rating": _rating.toString(),
-                            "review": _review,
-                          },
+                          "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/rating/add/${widget.newsId}/",
+                          {"rating": _rating.toString(), "review": _review},
                         );
                       }
 
@@ -192,7 +186,8 @@ class _RatingFormPageState extends State<RatingFormPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                response["message"] ?? "Gagal menyimpan rating, coba lagi.",
+                                response["message"] ??
+                                    "Gagal menyimpan rating, coba lagi.",
                               ),
                             ),
                           );
@@ -200,11 +195,9 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text("Error: $e"),
-                          ),
-                        );
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text("Error: $e")));
                       }
                     }
                   },
@@ -221,4 +214,3 @@ class _RatingFormPageState extends State<RatingFormPage> {
     );
   }
 }
-

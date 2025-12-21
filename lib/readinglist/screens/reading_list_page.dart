@@ -41,7 +41,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
     CookieRequest request,
   ) async {
     final response = await request.get(
-      'http://localhost:8000/readinglist/json/',
+      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/json/',
     );
 
     List<ReadingListEntry> list = [];
@@ -66,7 +66,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.postJson(
-        "http://localhost:8000/readinglist/lists/create/",
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/lists/create/",
         jsonEncode({"name": name}),
       );
 
@@ -86,7 +86,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.postJson(
-        "http://localhost:8000/readinglist/lists/$listId/rename/",
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/lists/$listId/rename/",
         jsonEncode({"name": newName}),
       );
 
@@ -106,7 +106,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
     final request = context.read<CookieRequest>();
     try {
       final response = await request.post(
-        "http://localhost:8000/readinglist/lists/$listId/delete/",
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/lists/$listId/delete/",
         {},
       );
 
@@ -127,7 +127,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
       // Endpoint add_remove berfungsi sebagai toggle.
       // Karena item sudah ada di list, ini akan menghapusnya.
       final response = await request.postJson(
-        "http://localhost:8000/readinglist/add_remove/$newsId/",
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/add_remove/$newsId/",
         jsonEncode({"list_id": listId}),
       );
 
@@ -159,7 +159,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
     try {
       // URL: /readinglist/items/<item_id>/toggle-read/
       final response = await request.post(
-        "http://localhost:8000/readinglist/items/$itemId/toggle-read/",
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/items/$itemId/toggle-read/",
         {},
       );
 
@@ -532,7 +532,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
                                     image: DecorationImage(
                                       fit: BoxFit.cover,
                                       image: NetworkImage(
-                                        'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(item.news.thumbnail)}',
+                                        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(item.news.thumbnail)}',
                                       ),
                                       onError: (exception, stackTrace) {},
                                     ),
@@ -643,7 +643,10 @@ class _ReadingListPageState extends State<ReadingListPage> {
                                         builder: (context) =>
                                             NewsDetailPage(news: newsData),
                                       ),
-                                    );
+                                    ).then((_) {
+                                      // Refresh data when returning from NewsDetailPage
+                                      _refreshData();
+                                    });
                                   }
                                 },
                               );

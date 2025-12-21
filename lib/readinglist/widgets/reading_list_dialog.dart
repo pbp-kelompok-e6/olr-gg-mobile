@@ -28,7 +28,7 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
     try {
       // Use localhost or 10.0.2.2 depending on your device
       final response = await request.get(
-          'http://localhost:8000/readinglist/api/status/${widget.newsId}/'
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/api/status/${widget.newsId}/',
       );
 
       if (mounted) {
@@ -52,7 +52,7 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
 
     try {
       final response = await request.postJson(
-        'http://localhost:8000/readinglist/add_remove/${widget.newsId}/',
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/add_remove/${widget.newsId}/',
         jsonEncode({"list_id": listId}),
       );
 
@@ -73,9 +73,9 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
         userLists[index]['is_in_list'] = !userLists[index]['is_in_list'];
       });
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Error: $e")),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
       }
     }
   }
@@ -87,24 +87,27 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: isLoading
-            ? const SizedBox(height: 100, child: Center(child: CircularProgressIndicator()))
+            ? const SizedBox(
+                height: 100,
+                child: Center(child: CircularProgressIndicator()),
+              )
             : userLists.isEmpty
             ? const Text("You don't have any reading lists yet.")
             : ListView.builder(
-          shrinkWrap: true,
-          itemCount: userLists.length,
-          itemBuilder: (context, index) {
-            final list = userLists[index];
-            return CheckboxListTile(
-              title: Text(list['name']),
-              value: list['is_in_list'],
-              activeColor: Colors.blue,
-              onChanged: (bool? value) {
-                _toggleList(list['id'], index);
-              },
-            );
-          },
-        ),
+                shrinkWrap: true,
+                itemCount: userLists.length,
+                itemBuilder: (context, index) {
+                  final list = userLists[index];
+                  return CheckboxListTile(
+                    title: Text(list['name']),
+                    value: list['is_in_list'],
+                    activeColor: Colors.blue,
+                    onChanged: (bool? value) {
+                      _toggleList(list['id'], index);
+                    },
+                  );
+                },
+              ),
       ),
       actions: [
         TextButton(

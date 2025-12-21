@@ -138,6 +138,48 @@ class _RatingsSectionState extends State<RatingsSection> {
                 return const Center(child: CircularProgressIndicator());
               }
 
+              if (snapshot.hasError) {
+                final errorMsg = snapshot.error.toString();
+                final isNetworkError = errorMsg.contains('SocketException') ||
+                    errorMsg.contains('Connection') ||
+                    errorMsg.contains('timeout');
+                
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Icon(
+                          isNetworkError ? Icons.wifi_off : Icons.error_outline,
+                          size: 48,
+                          color: Colors.grey[400],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          isNetworkError
+                              ? 'Tidak dapat memuat rating'
+                              : 'Gagal memuat rating',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ElevatedButton.icon(
+                          onPressed: () => setState(() {}),
+                          icon: const Icon(Icons.refresh, size: 18),
+                          label: const Text('Coba Lagi'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return Center(
                   child: Padding(

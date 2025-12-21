@@ -15,6 +15,8 @@ class ReadingListDialog extends StatefulWidget {
 class _ReadingListDialogState extends State<ReadingListDialog> {
   List<dynamic> userLists = [];
   bool isLoading = true;
+  bool hasError = false;
+  String errorMessage = '';
 
   @override
   void initState() {
@@ -26,8 +28,16 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
 
   Future<void> _fetchListStatus() async {
     final request = context.read<CookieRequest>();
+
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+        hasError = false;
+        errorMessage = '';
+      });
+    }
+
     try {
-      // Use localhost or 10.0.2.2 depending on your device
       final response = await request.get(
         'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/readinglist/api/status/${widget.newsId}/',
       );
@@ -36,11 +46,23 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
         setState(() {
           userLists = response;
           isLoading = false;
+          hasError = false;
         });
       }
     } catch (e) {
       debugPrint("Error fetching status: $e");
-      if (mounted) setState(() => isLoading = false);
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          hasError = true;
+          errorMessage =
+              e.toString().contains('SocketException') ||
+                  e.toString().contains('Connection') ||
+                  e.toString().contains('timeout')
+              ? 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda.'
+              : 'Terjadi kesalahan. Silakan coba lagi.';
+        });
+      }
     }
   }
 
@@ -137,6 +159,31 @@ class _ReadingListDialogState extends State<ReadingListDialog> {
               const SizedBox(
                 height: 100,
                 child: Center(child: CircularProgressIndicator()),
+              )
+            else if (hasError)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Column(
+                  children: [
+                    Icon(Icons.wifi_off, size: 48, color: Colors.grey.shade400),
+                    const SizedBox(height: 12),
+                    Text(
+                      errorMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey.shade600),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: _fetchListStatus,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Coba Lagi'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
               )
             else if (userLists.isEmpty)
               const Padding(

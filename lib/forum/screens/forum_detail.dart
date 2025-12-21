@@ -419,6 +419,54 @@ class _ForumDetailPageState extends State<ForumDetailPage> {
             FutureBuilder<List<ForumComment>>(
               future: fetchComments(request),
               builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
+                
+                if (snapshot.hasError) {
+                  final errorMsg = snapshot.error.toString();
+                  final isNetworkError = errorMsg.contains('SocketException') ||
+                      errorMsg.contains('Connection') ||
+                      errorMsg.contains('timeout');
+                  
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Icon(
+                            isNetworkError ? Icons.wifi_off : Icons.error_outline,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            isNetworkError
+                                ? 'Tidak dapat memuat komentar'
+                                : 'Gagal memuat komentar',
+                            style: TextStyle(color: Colors.grey[700]),
+                          ),
+                          const SizedBox(height: 12),
+                          ElevatedButton.icon(
+                            onPressed: () => setState(() {}),
+                            icon: const Icon(Icons.refresh, size: 18),
+                            label: const Text('Coba Lagi'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+                
                 final comments = snapshot.data ?? [];
                 final commentCount = comments.length;
 

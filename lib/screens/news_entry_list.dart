@@ -144,10 +144,58 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
+                  final errorMsg = snapshot.error.toString();
+                  final isNetworkError =
+                      errorMsg.contains('SocketException') ||
+                      errorMsg.contains('Connection') ||
+                      errorMsg.contains('timeout') ||
+                      errorMsg.contains('XMLHttpRequest');
+
                   return Center(
-                    child: Text(
-                      "Failed to load news",
-                      style: TextStyle(color: Colors.red[600], fontSize: 16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            isNetworkError
+                                ? Icons.wifi_off
+                                : Icons.error_outline,
+                            size: 64,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            isNetworkError
+                                ? 'Tidak dapat terhubung ke server'
+                                : 'Gagal memuat berita',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey[800],
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isNetworkError
+                                ? 'Periksa koneksi internet Anda dan coba lagi.'
+                                : 'Silakan coba lagi nanti.',
+                            style: TextStyle(color: Colors.grey[600]),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton.icon(
+                            onPressed: () => setState(() {}),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Coba Lagi'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 } else {

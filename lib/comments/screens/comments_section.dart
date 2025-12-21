@@ -18,6 +18,8 @@ class CommentsSection extends StatefulWidget {
 class CommentsSectionState extends State<CommentsSection> {
   final ValueNotifier<List<CommentEntry>> _commentsNotifier = ValueNotifier([]);
   bool _isLoading = true;
+  bool _hasError = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -32,6 +34,14 @@ class CommentsSectionState extends State<CommentsSection> {
   }
 
   Future<void> _loadComments() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+        _hasError = false;
+        _errorMessage = '';
+      });
+    }
+
     try {
       final response = await http.get(
         Uri.parse(
@@ -48,13 +58,33 @@ class CommentsSectionState extends State<CommentsSection> {
 
         _commentsNotifier.value = comments;
         if (mounted) {
-          setState(() => _isLoading = false);
+          setState(() {
+            _isLoading = false;
+            _hasError = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _hasError = true;
+            _errorMessage = 'Gagal memuat komentar. Silakan coba lagi.';
+          });
         }
       }
     } catch (e) {
       print('Error loading comments: $e');
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+          _errorMessage =
+              e.toString().contains('SocketException') ||
+                  e.toString().contains('Connection') ||
+                  e.toString().contains('timeout')
+              ? 'Tidak dapat terhubung ke server.'
+              : 'Terjadi kesalahan. Silakan coba lagi.';
+        });
       }
     }
   }
@@ -69,6 +99,35 @@ class CommentsSectionState extends State<CommentsSection> {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 32),
         child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_hasError) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 32),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(Icons.wifi_off, size: 48, color: Colors.grey.shade400),
+              const SizedBox(height: 12),
+              Text(
+                _errorMessage,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _loadComments,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Coba Lagi'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 

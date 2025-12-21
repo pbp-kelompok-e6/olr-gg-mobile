@@ -35,10 +35,14 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
     final data = widget.initialData;
 
     _usernameController = TextEditingController(text: data['username'] ?? '');
-    _firstNameController = TextEditingController(text: data['first_name'] ?? '');
+    _firstNameController = TextEditingController(
+      text: data['first_name'] ?? '',
+    );
     _lastNameController = TextEditingController(text: data['last_name'] ?? '');
     _bioController = TextEditingController(text: data['bio'] ?? '');
-    _strikesController = TextEditingController(text: (data['strikes'] ?? 0).toString());
+    _strikesController = TextEditingController(
+      text: (data['strikes'] ?? 0).toString(),
+    );
 
     String initialRole = data['role'] ?? 'reader';
     if (_roleOptions.contains(initialRole)) {
@@ -63,7 +67,8 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
     setState(() => _isLoading = true);
 
-    final String url = "http://localhost:8000/users/admin-dashboard/edit-user/${widget.userId}/";
+    final String url =
+        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/edit-user/${widget.userId}/";
 
     try {
       final response = await request.post(url, {
@@ -98,7 +103,10 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Terjadi kesalahan: $e"), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text("Terjadi kesalahan: $e"),
+            backgroundColor: Colors.red,
+          ),
         );
       }
     } finally {
@@ -125,7 +133,11 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
             children: [
               const Text(
                 "Edit Data User",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.indigo),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                ),
               ),
               const SizedBox(height: 20),
 
@@ -136,7 +148,8 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
                   border: OutlineInputBorder(),
                   prefixIcon: Icon(Icons.person),
                 ),
-                validator: (val) => val == null || val.isEmpty ? "Username wajib diisi" : null,
+                validator: (val) =>
+                    val == null || val.isEmpty ? "Username wajib diisi" : null,
               ),
               const SizedBox(height: 16),
 
@@ -183,7 +196,7 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
               const Divider(),
               const SizedBox(height: 8),
-              
+
               Row(
                 children: [
                   Expanded(
@@ -218,7 +231,7 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
                   alignLabelWithHint: true,
                 ),
               ),
-              
+
               const SizedBox(height: 32),
 
               SizedBox(
@@ -228,12 +241,24 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
                     backgroundColor: Colors.indigo,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   onPressed: _isLoading ? null : () => _submitForm(request),
                   child: _isLoading
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white))
-                      : const Text("Save Changes", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white),
+                        )
+                      : const Text(
+                          "Save Changes",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 ),
               ),
             ],

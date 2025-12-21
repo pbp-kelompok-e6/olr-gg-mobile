@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart'; 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:olrggmobile/widgets/left_drawer.dart'; 
+import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'package:olrggmobile/users/models/admin_models.dart';
-import 'package:olrggmobile/users/screens/profile_page.dart'; 
+import 'package:olrggmobile/users/screens/profile_page.dart';
 import 'package:olrggmobile/users/screens/admin_edit_user.dart';
 
 class AdminDashboardPage extends StatefulWidget {
@@ -14,11 +14,12 @@ class AdminDashboardPage extends StatefulWidget {
   State<AdminDashboardPage> createState() => _AdminDashboardPageState();
 }
 
-class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTickerProviderStateMixin {
+class _AdminDashboardPageState extends State<AdminDashboardPage>
+    with SingleTickerProviderStateMixin {
   List<AdminUser> users = [];
   List<AdminReport> reports = [];
   List<AdminWriterRequest> requests = [];
-  
+
   bool isLoading = true;
   String errorMessage = '';
 
@@ -28,7 +29,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final request = Provider.of<CookieRequest>(context, listen: false);
       fetchAdminData(request);
@@ -43,68 +44,116 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
 
   Future<void> fetchAdminData(CookieRequest request) async {
     if (users.isEmpty) {
-        setState(() { isLoading = true; errorMessage = ''; });
+      setState(() {
+        isLoading = true;
+        errorMessage = '';
+      });
     }
 
     try {
-      final response = await request.get('http://localhost:8000/users/admin-dashboard/?type=json');
-      
+      final response = await request.get(
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/?type=json',
+      );
+
       if (response['status'] == 'success') {
         setState(() {
-          users = List<AdminUser>.from(response['users'].map((x) => AdminUser.fromJson(x)));
-          reports = List<AdminReport>.from(response['reports'].map((x) => AdminReport.fromJson(x)));
-          requests = List<AdminWriterRequest>.from(response['writer_requests'].map((x) => AdminWriterRequest.fromJson(x)));
+          users = List<AdminUser>.from(
+            response['users'].map((x) => AdminUser.fromJson(x)),
+          );
+          reports = List<AdminReport>.from(
+            response['reports'].map((x) => AdminReport.fromJson(x)),
+          );
+          requests = List<AdminWriterRequest>.from(
+            response['writer_requests'].map(
+              (x) => AdminWriterRequest.fromJson(x),
+            ),
+          );
           isLoading = false;
         });
       } else {
-        setState(() { errorMessage = response['message']; isLoading = false; });
+        setState(() {
+          errorMessage = response['message'];
+          isLoading = false;
+        });
       }
     } catch (e) {
-      setState(() { errorMessage = "Gagal terhubung: $e"; isLoading = false; });
+      setState(() {
+        errorMessage = "Gagal terhubung: $e";
+        isLoading = false;
+      });
     }
   }
 
   Future<void> resetStrikes(int userId, CookieRequest request) async {
     try {
-      final response = await request.post('http://localhost:8000/users/admin-dashboard/reset-strikes/$userId/', {});
+      final response = await request.post(
+        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/reset-strikes/$userId/',
+        {},
+      );
       if (response['status'] == 'success') {
-        if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Strikes direset!")));
+        if (mounted)
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text("Strikes direset!")));
         fetchAdminData(request);
       }
     } catch (e) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
-  Future<void> handleReport(int id, String action, CookieRequest request) async {
-    final url = action == 'accept' 
-      ? 'http://localhost:8000/users/admin-dashboard/accept-report/$id/'
-      : 'http://localhost:8000/users/admin-dashboard/delete-report/$id/';
-    
+  Future<void> handleReport(
+    int id,
+    String action,
+    CookieRequest request,
+  ) async {
+    final url = action == 'accept'
+        ? 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/accept-report/$id/'
+        : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/delete-report/$id/';
+
     try {
       final response = await request.post(url, {});
       if (response['status'] == 'success') {
-        if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
+        if (mounted)
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(response['message'])));
         fetchAdminData(request);
       }
     } catch (e) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
-  Future<void> handleWriterRequest(int id, String action, CookieRequest request) async {
+  Future<void> handleWriterRequest(
+    int id,
+    String action,
+    CookieRequest request,
+  ) async {
     final url = action == 'approve'
-      ? 'http://localhost:8000/users/admin-dashboard/approve-writer/$id/'
-      : 'http://localhost:8000/users/admin-dashboard/reject-writer/$id/';
+        ? 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/approve-writer/$id/'
+        : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/reject-writer/$id/';
 
     try {
       final response = await request.post(url, {});
       if (response['status'] == 'success') {
-        if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(response['message'])));
+        if (mounted)
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(response['message'])));
         fetchAdminData(request);
       }
     } catch (e) {
-      if(mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Error: $e")));
     }
   }
 
@@ -132,29 +181,31 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
       drawer: const LeftDrawer(),
       backgroundColor: Colors.grey[100],
       body: isLoading
-        ? const Center(child: CircularProgressIndicator())
-        : errorMessage.isNotEmpty
-            ? Center(child: Text(errorMessage))
-            : TabBarView(
-                controller: _tabController,
-                children: [
-                  _UserListTab(
-                    users: users, 
-                    onRefresh: () => fetchAdminData(request),
-                    onRequestAction: (id) => resetStrikes(id, request),
-                  ),
-                  _ReportListTab(
-                    reports: reports, 
-                    onRefresh: () => fetchAdminData(request),
-                    onRequestAction: (id, action) => handleReport(id, action, request),
-                  ),
-                  _RequestListTab(
-                    requests: requests, 
-                    onRefresh: () => fetchAdminData(request),
-                    onRequestAction: (id, action) => handleWriterRequest(id, action, request),
-                  ),
-                ],
-              ),
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+          ? Center(child: Text(errorMessage))
+          : TabBarView(
+              controller: _tabController,
+              children: [
+                _UserListTab(
+                  users: users,
+                  onRefresh: () => fetchAdminData(request),
+                  onRequestAction: (id) => resetStrikes(id, request),
+                ),
+                _ReportListTab(
+                  reports: reports,
+                  onRefresh: () => fetchAdminData(request),
+                  onRequestAction: (id, action) =>
+                      handleReport(id, action, request),
+                ),
+                _RequestListTab(
+                  requests: requests,
+                  onRefresh: () => fetchAdminData(request),
+                  onRequestAction: (id, action) =>
+                      handleWriterRequest(id, action, request),
+                ),
+              ],
+            ),
     );
   }
 }
@@ -165,16 +216,17 @@ class _UserListTab extends StatefulWidget {
   final Function(int) onRequestAction;
 
   const _UserListTab({
-    required this.users, 
-    required this.onRefresh, 
-    required this.onRequestAction
+    required this.users,
+    required this.onRefresh,
+    required this.onRequestAction,
   });
 
   @override
   State<_UserListTab> createState() => _UserListTabState();
 }
 
-class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClientMixin {
+class _UserListTabState extends State<_UserListTab>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -198,7 +250,7 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
             'username': user.username,
             'first_name': firstName,
             'last_name': lastName,
-            'email': '', 
+            'email': '',
             'bio': '',
             'role': user.role,
             'strikes': user.strikes,
@@ -226,13 +278,17 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
           return Card(
             elevation: 2,
             margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => ProfilePage(userId: user.id)),
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(userId: user.id),
+                  ),
                 );
               },
               child: Padding(
@@ -244,25 +300,32 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                         CircleAvatar(
                           radius: 25,
                           backgroundColor: Colors.grey[200],
-                          backgroundImage: () {
-                            String url = user.profilePictureUrl.trim();
-                            if (url.isEmpty) {
-                              return const AssetImage('images/default_profile_picture.jpg');
-                            }
+                          backgroundImage:
+                              () {
+                                    String url = user.profilePictureUrl.trim();
+                                    if (url.isEmpty) {
+                                      return const AssetImage(
+                                        'images/default_profile_picture.jpg',
+                                      );
+                                    }
 
-                            if (url.startsWith('http')) {
-                              return CachedNetworkImageProvider(
-                                  'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(url)}'
-                              );
-                            }
-                            else {
-                              if (!url.startsWith('/')) url = '/$url';
-                              return CachedNetworkImageProvider('http://localhost:8000$url');
-                            }
-                          }() as ImageProvider,
+                                    if (url.startsWith('http')) {
+                                      return CachedNetworkImageProvider(
+                                        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}',
+                                      );
+                                    } else {
+                                      if (!url.startsWith('/')) url = '/$url';
+                                      return CachedNetworkImageProvider(
+                                        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url',
+                                      );
+                                    }
+                                  }()
+                                  as ImageProvider,
 
                           onBackgroundImageError: (_, __) {
-                            print("Gagal load image: ${user.profilePictureUrl}");
+                            print(
+                              "Gagal load image: ${user.profilePictureUrl}",
+                            );
                           },
                         ),
                         const SizedBox(width: 12),
@@ -270,8 +333,20 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(user.username, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                              Text(user.fullName.isEmpty ? "-" : user.fullName, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                              Text(
+                                user.username,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                user.fullName.isEmpty ? "-" : user.fullName,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 13,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -279,7 +354,7 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                       ],
                     ),
                     const Divider(height: 20),
-                    
+
                     // status dan jumlah strike
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -288,9 +363,9 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                         _AdminHelpers.buildStrikesBadge(user.strikes),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -298,7 +373,10 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.indigo,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
                             textStyle: const TextStyle(fontSize: 12),
                           ),
                           icon: const Icon(Icons.edit, size: 14),
@@ -312,21 +390,24 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
                             style: OutlinedButton.styleFrom(
                               foregroundColor: Colors.orange[800],
                               side: BorderSide(color: Colors.orange[800]!),
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               textStyle: const TextStyle(fontSize: 12),
                             ),
                             icon: const Icon(Icons.refresh, size: 14),
                             label: const Text("Reset Strike"),
                             onPressed: () => _AdminHelpers.showConfirmDialog(
-                              context, 
-                              "Reset Strikes", 
-                              "Reset strikes untuk user ini menjadi 0?", 
-                              () => widget.onRequestAction(user.id)
+                              context,
+                              "Reset Strikes",
+                              "Reset strikes untuk user ini menjadi 0?",
+                              () => widget.onRequestAction(user.id),
                             ),
                           ),
-                        ]
+                        ],
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -343,20 +424,29 @@ class _ReportListTab extends StatefulWidget {
   final Future<void> Function() onRefresh;
   final Function(int, String) onRequestAction;
 
-  const _ReportListTab({required this.reports, required this.onRefresh, required this.onRequestAction});
+  const _ReportListTab({
+    required this.reports,
+    required this.onRefresh,
+    required this.onRequestAction,
+  });
 
   @override
   State<_ReportListTab> createState() => _ReportListTabState();
 }
 
-class _ReportListTabState extends State<_ReportListTab> with AutomaticKeepAliveClientMixin {
+class _ReportListTabState extends State<_ReportListTab>
+    with AutomaticKeepAliveClientMixin {
   @override
-  bool get wantKeepAlive => true; 
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (widget.reports.isEmpty) return _AdminHelpers.buildEmptyState("Tidak ada laporan.", widget.onRefresh);
+    if (widget.reports.isEmpty)
+      return _AdminHelpers.buildEmptyState(
+        "Tidak ada laporan.",
+        widget.onRefresh,
+      );
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,
@@ -368,7 +458,9 @@ class _ReportListTabState extends State<_ReportListTab> with AutomaticKeepAliveC
           return Card(
             elevation: 2,
             margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -378,29 +470,64 @@ class _ReportListTabState extends State<_ReportListTab> with AutomaticKeepAliveC
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(rep.createdAt, style: const TextStyle(fontSize: 12)),
-                      Text("by @${rep.reporterUsername}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.indigo)),
+                      Text(
+                        "by @${rep.reporterUsername}",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.indigo,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Text("Melaporkan: @${rep.reportedUsername}", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                  Text(
+                    "Melaporkan: @${rep.reportedUsername}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(rep.reason, style: const TextStyle(fontStyle: FontStyle.italic)),
+                  Text(
+                    rep.reason,
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-                        onPressed: () => _AdminHelpers.showConfirmDialog(context, "Accept", "Terima?", () => widget.onRequestAction(rep.id, 'accept')),
-                        child: const Text("Accept"),
-                      )),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => _AdminHelpers.showConfirmDialog(
+                            context,
+                            "Accept",
+                            "Terima?",
+                            () => widget.onRequestAction(rep.id, 'accept'),
+                          ),
+                          child: const Text("Accept"),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                        onPressed: () => _AdminHelpers.showConfirmDialog(context, "Reject", "Tolak?", () => widget.onRequestAction(rep.id, 'delete')),
-                        child: const Text("Reject"),
-                      )),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () => _AdminHelpers.showConfirmDialog(
+                            context,
+                            "Reject",
+                            "Tolak?",
+                            () => widget.onRequestAction(rep.id, 'delete'),
+                          ),
+                          child: const Text("Reject"),
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -416,20 +543,29 @@ class _RequestListTab extends StatefulWidget {
   final Future<void> Function() onRefresh;
   final Function(int, String) onRequestAction;
 
-  const _RequestListTab({required this.requests, required this.onRefresh, required this.onRequestAction});
+  const _RequestListTab({
+    required this.requests,
+    required this.onRefresh,
+    required this.onRequestAction,
+  });
 
   @override
   State<_RequestListTab> createState() => _RequestListTabState();
 }
 
-class _RequestListTabState extends State<_RequestListTab> with AutomaticKeepAliveClientMixin {
+class _RequestListTabState extends State<_RequestListTab>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    if (widget.requests.isEmpty) return _AdminHelpers.buildEmptyState("Tidak ada request.", widget.onRefresh);
+    if (widget.requests.isEmpty)
+      return _AdminHelpers.buildEmptyState(
+        "Tidak ada request.",
+        widget.onRefresh,
+      );
 
     return RefreshIndicator(
       onRefresh: widget.onRefresh,
@@ -441,30 +577,47 @@ class _RequestListTabState extends State<_RequestListTab> with AutomaticKeepAliv
           return Card(
             elevation: 2,
             margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("@${req.username}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    "@${req.username}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const Divider(),
                   Text(req.reason),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      Expanded(child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
-                        onPressed: () => widget.onRequestAction(req.id, 'approve'),
-                        child: const Text("Approve"),
-                      )),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () =>
+                              widget.onRequestAction(req.id, 'approve'),
+                          child: const Text("Approve"),
+                        ),
+                      ),
                       const SizedBox(width: 8),
-                      Expanded(child: OutlinedButton(
-                        onPressed: () => widget.onRequestAction(req.id, 'reject'),
-                        child: const Text("Reject"),
-                      )),
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () =>
+                              widget.onRequestAction(req.id, 'reject'),
+                          child: const Text("Reject"),
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
@@ -479,17 +632,35 @@ class _AdminHelpers {
   static Widget buildRoleBadge(String role) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
-      child: Text(role.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        role.toUpperCase(),
+        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
   static Widget buildStatusBadge(bool isActive) {
-    return Text(isActive ? "Active" : "Inactive", style: TextStyle(color: isActive ? Colors.green : Colors.grey, fontWeight: FontWeight.bold));
+    return Text(
+      isActive ? "Active" : "Inactive",
+      style: TextStyle(
+        color: isActive ? Colors.green : Colors.grey,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 
   static Widget buildStrikesBadge(int strikes) {
-    return Text("$strikes / 3 Strikes", style: TextStyle(color: strikes >= 3 ? Colors.red : Colors.orange, fontWeight: FontWeight.bold));
+    return Text(
+      "$strikes / 3 Strikes",
+      style: TextStyle(
+        color: strikes >= 3 ? Colors.red : Colors.orange,
+        fontWeight: FontWeight.bold,
+      ),
+    );
   }
 
   static Widget buildEmptyState(String msg, Future<void> Function() onRefresh) {
@@ -498,21 +669,37 @@ class _AdminHelpers {
       child: ListView(
         children: [
           SizedBox(height: 100),
-          Center(child: Text(msg, style: TextStyle(color: Colors.grey))),
+          Center(
+            child: Text(msg, style: TextStyle(color: Colors.grey)),
+          ),
         ],
       ),
     );
   }
 
-  static void showConfirmDialog(BuildContext context, String title, String content, VoidCallback onConfirm) {
+  static void showConfirmDialog(
+    BuildContext context,
+    String title,
+    String content,
+    VoidCallback onConfirm,
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(title),
         content: Text(content),
         actions: [
-          TextButton(child: const Text("Batal"), onPressed: () => Navigator.of(ctx).pop()),
-          TextButton(child: const Text("Ya"), onPressed: () { Navigator.of(ctx).pop(); onConfirm(); }),
+          TextButton(
+            child: const Text("Batal"),
+            onPressed: () => Navigator.of(ctx).pop(),
+          ),
+          TextButton(
+            child: const Text("Ya"),
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              onConfirm();
+            },
+          ),
         ],
       ),
     );

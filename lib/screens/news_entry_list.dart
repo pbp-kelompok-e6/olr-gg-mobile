@@ -90,7 +90,7 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
               ],
             ),
           ),
-          if (role != "reader")
+          if (role == "writer" || role == "admin")
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(

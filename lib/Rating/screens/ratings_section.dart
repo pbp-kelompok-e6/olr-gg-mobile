@@ -38,41 +38,21 @@ class _RatingsSectionState extends State<RatingsSection> {
 
   Future<void> _deleteRating(CookieRequest request, dynamic ratingId) async {
     try {
-      final url = Uri.parse("http://localhost:8000/rating/delete/$ratingId/");
-
-      // Get cookies from CookieRequest for authentication
-      final cookies = request.headers['cookie'] ?? '';
-
-      final httpResponse = await http.delete(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Cookie': cookies,
-        },
+      // Use CookieRequest.post() instead of http.delete for proper authentication
+      final response = await request.post(
+        "http://localhost:8000/rating/delete/$ratingId/",
+        {},
       );
 
       if (context.mounted) {
-        if (httpResponse.statusCode == 200) {
-          final response = jsonDecode(httpResponse.body);
-          if (response['status'] == 'success') {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Rating berhasil dihapus")),
-            );
-            setState(() {}); // Refresh the list
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(response['message'] ?? "Gagal menghapus rating")),
-            );
-          }
-        } else if (httpResponse.statusCode == 204) {
-          // 204 No Content - successful deletion
+        if (response['status'] == 'success') {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Rating berhasil dihapus")),
           );
           setState(() {}); // Refresh the list
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Gagal menghapus rating. Status: ${httpResponse.statusCode}")),
+            SnackBar(content: Text(response['message'] ?? "Gagal menghapus rating")),
           );
         }
       }

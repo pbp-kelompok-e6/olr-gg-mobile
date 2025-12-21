@@ -157,34 +157,14 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       dynamic response;
 
                       if (isEditing) {
-                        // Edit existing rating - use PUT method with http package
-                        final url = Uri.parse("http://localhost:8000/rating/edit/${widget.ratingId}/");
-
-                        // Get cookies properly from CookieRequest
-                        String cookieHeader = '';
-                        if (request.cookies.isNotEmpty) {
-                          cookieHeader = request.cookies.entries
-                              .map((entry) => '${entry.key}=${entry.value}')
-                              .join('; ');
-                        }
-
-                        final httpResponse = await http.put(
-                          url,
-                          headers: <String, String>{
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Cookie': cookieHeader,
-                          },
-                          body: {
+                        // Edit existing rating - use CookieRequest.post() for proper authentication
+                        response = await request.post(
+                          "http://localhost:8000/rating/edit/${widget.ratingId}/",
+                          {
                             "rating": _rating.toString(),
                             "review": _review,
                           },
                         );
-
-                        if (httpResponse.statusCode == 200) {
-                          response = jsonDecode(httpResponse.body);
-                        } else {
-                          throw Exception('Failed to update rating: ${httpResponse.statusCode}');
-                        }
                       } else {
                         // Create new rating - use POST method (CookieRequest works fine)
                         response = await request.post(

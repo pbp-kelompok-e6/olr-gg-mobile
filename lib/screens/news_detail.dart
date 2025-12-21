@@ -196,15 +196,11 @@ class NewsDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Ratings Section
+                RatingsSection(newsId: news.id),
               ],
             ),
-<<<<<<< Updated upstream
           ),
-=======
-            // Ratings Section
-            RatingsSection(newsId: news.id),
-          ],
->>>>>>> Stashed changes
         ),
       ),
     );

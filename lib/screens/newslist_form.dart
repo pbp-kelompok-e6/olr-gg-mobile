@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'package:olrggmobile/screens/menu.dart';
 
 class NewsFormPage extends StatefulWidget {
@@ -14,282 +14,239 @@ class NewsFormPage extends StatefulWidget {
 
 class _NewsFormPageState extends State<NewsFormPage> {
   final _formKey = GlobalKey<FormState>();
+
   String _title = "";
-  String _category = "basketball";
   String _content = "";
+  String? _category;
   String _thumbnail = "";
   bool _isFeatured = false;
 
   final List<String> _categories = [
     'basketball',
-    'baseball',
-    'football',
     'volleyball',
+    'football',
+    'baseball',
     'hockey',
     'soccer',
   ];
+
+  InputDecoration inputStyle(String label, String hint) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
+
     return Scaffold(
-      backgroundColor: Colors.blue[300],
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Form Tambah Berita',
-            style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
+        title: const Text("Create News"),
+        foregroundColor: Colors.grey,
+        centerTitle: true,
       ),
-      drawer: LeftDrawer(),
-      body: Form(
-        key: _formKey,
+      drawer: const LeftDrawer(),
+
+      body: Center(
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children:[
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "Judul Berita",
-                    labelText: "Judul Berita",
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 1.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 2.0,
-                      ),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _title = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Judul tidak boleh kosong!";
-                    }
-                    return null;
-                  },
-                ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Card(
+              color: Colors.white,
+              elevation: 6,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
               ),
-              // === Description ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: "Content Berita",
-                    labelText: "Content Berita",
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 1.5,
+              margin: const EdgeInsets.all(16),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Create News",
+                        style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 2.0,
+                      const SizedBox(height: 6),
+                      const Text(
+                        "Share your football news and stories with the community",
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _content = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) {
-                      return "Content produk tidak boleh kosong!";
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              // === Category ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: "Kategori",
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 1.5,
+                      const Divider(height: 32),
+                      TextFormField(
+                        decoration: inputStyle("Title", "Enter news title"),
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Title cannot be empty"
+                            : null,
+                        onChanged: (value) => _title = value,
                       ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 2.0,
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        maxLines: 5,
+                        decoration: inputStyle("Content", "Enter news content"),
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Content cannot be empty"
+                            : null,
+                        onChanged: (value) => _content = value,
                       ),
-                    ),
-                  ),
-                  value: _category,
-                  items: _categories
-                      .map((cat) => DropdownMenuItem(
-                    value: cat,
-                    child: Text(
-                        cat[0].toUpperCase() + cat.substring(1)),
-                  ))
-                      .toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _category = newValue!;
-                    });
-                  },
-                ),
-              ),
-
-              // === Thumbnail URL ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    hintText: "URL Thumbnail (opsional)",
-                    labelText: "URL Thumbnail",
-                    filled: true,
-                    fillColor: Colors.white,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 1.5,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                      borderSide: BorderSide(
-                        color: Colors.blue.shade900,
-                        width: 2.0,
-                      ),
-                    ),
-                  ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _thumbnail = value!;
-                    });
-                  },
-                  validator: (String? value) {
-                    if (value == null || value.isEmpty) return null;
-                    final urlPattern =
-                        r'^(https?:\/\/)?'
-                        r'(([a-zA-Z0-9_-]+\.)+[a-zA-Z]{2,6})'
-                        r'(\/[a-zA-Z0-9@:%_\+.~#?&//=]*)?$';
-                    final regex = RegExp(urlPattern);
-                    if (!regex.hasMatch(value)) {
-                      return "Masukkan URL yang valid!";
-                    }
-
-                    return null;
-                  },
-                ),
-              ),
-
-              // === Is Featured ===
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.yellow,
-                    border: Border.all(
-                      color: Colors.blue.shade900, // warna border
-                      width: 1.2,
-                    ),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: SwitchListTile(
-                    contentPadding: EdgeInsets.zero, // biar pas sama container
-                    title: const Text("Tandai sebagai Berita Unggulan"),
-                    value: _isFeatured,
-                    onChanged: (bool value) {
-                      setState(() {
-                        _isFeatured = value;
-                      });
-                    },
-                  ),
-                ),
-              ),
-        // === Tombol Simpan ===
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all(Colors.blue),
-                    ),
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        // TODO: Replace the URL with your app's URL
-                        // To connect Android emulator with Django on localhost, use URL http://10.0.2.2/
-                        // If you using chrome,  use URL http://localhost:8000
-
-                        final response = await request.postJson(
-                          "http://localhost:8000/create-flutter/",
-                          jsonEncode({
-                            "title": _title,
-                            "content": _content,
-                            "thumbnail": _thumbnail,
-                            "category": _category,
-                            "is_featured": _isFeatured,
-                          }),
-                        );
-                        if (context.mounted) {
-                          if (response['status'] == 'success') {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text("News successfully saved!"),
-                            ));
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MyHomePage()),
-                            );
-                          } else {
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(const SnackBar(
-                              content: Text("Something went wrong, please try again."),
-                            ));
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        initialValue: _category,
+                        decoration: inputStyle("Category", "Choose a category"),
+                        items: [
+                          const DropdownMenuItem<String>(
+                            value: null,
+                            child: Text(
+                              "Choose a category",
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                          ..._categories.map(
+                            (c) => DropdownMenuItem(
+                              value: c,
+                              child: Text(c[0].toUpperCase() + c.substring(1)),
+                            ),
+                          ),
+                        ],
+                        validator: (value) {
+                          if (value == null) {
+                            return "Pilih kategori";
                           }
-                        }
-                      }
-                    },
-                    child: const Text(
-                      "Simpan",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                          return null;
+                        },
+                        onChanged: (val) {
+                          setState(() {
+                            _category = val!;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        decoration: inputStyle(
+                          "Thumbnail URL",
+                          "https://example.com/image.jpg",
+                        ),
+                        onChanged: (value) => _thumbnail = value,
+                      ),
+                      const SizedBox(height: 16),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.black, width: 1.2),
+                        ),
+                        child: SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text(
+                            "Featured News",
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          value: _isFeatured,
+                          activeThumbColor: Colors.blue.shade700,
+                          activeTrackColor: Colors.blue.shade200,
+                          inactiveThumbColor: Colors.grey.shade700,
+                          inactiveTrackColor: Colors.grey.shade300,
+                          onChanged: (val) {
+                            setState(() {
+                              _isFeatured = val;
+                            });
+                          },
+                        ),
+                      ),
+                      const Divider(height: 32),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.black,
+                              ),
+                              child: const Text("Cancel"),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red[700],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
+                              ),
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  final response = await request.postJson(
+                                    "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/create-flutter/",
+                                    jsonEncode({
+                                      "title": _title,
+                                      "content": _content,
+                                      "category": _category,
+                                      "thumbnail": _thumbnail,
+                                      "is_featured": _isFeatured,
+                                    }),
+                                  );
+
+                                  if (context.mounted) {
+                                    if (response["status"] == "success") {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            "News successfully published",
+                                          ),
+                                        ),
+                                      );
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => MyHomePage(),
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                            "Failed to publish news",
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  }
+                                }
+                              },
+                              child: const Text("Publish News"),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),

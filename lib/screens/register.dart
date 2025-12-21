@@ -47,7 +47,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ],
                 border: Border.all(
-                    color: Colors.red.shade200.withOpacity(0.3), width: 1),
+                  color: Colors.red.shade200.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -91,7 +93,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         const Text(
                           'Create your account to start sharing sports news',
                           style: TextStyle(
-                              color: Color(0xFF6b7280), fontSize: 14),
+                            color: Color(0xFF6b7280),
+                            fontSize: 14,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -99,27 +103,35 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                   const Divider(height: 1, color: Colors.transparent),
                   Padding(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 24,
+                    ),
                     child: Column(
                       children: [
                         TextField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             hintText: 'Enter your username',
-                            prefixIcon: const Icon(Icons.person_outline,
-                                color: Color(0xFF9ca3af)),
+                            prefixIcon: const Icon(
+                              Icons.person_outline,
+                              color: Color(0xFF9ca3af),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFf9fafb),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                  color: Color(0xFFe5e7eb), width: 2),
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                              const BorderSide(color: Color(0xFFdc2626), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -129,19 +141,25 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Enter your password',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: Color(0xFF9ca3af)),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF9ca3af),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFf9fafb),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                  color: Color(0xFFe5e7eb), width: 2),
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                              const BorderSide(color: Color(0xFFdc2626), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -151,19 +169,25 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Confirm your password',
-                            prefixIcon: const Icon(Icons.lock_outline,
-                                color: Color(0xFF9ca3af)),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF9ca3af),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFf9fafb),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: const BorderSide(
-                                  color: Color(0xFFe5e7eb), width: 2),
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                              const BorderSide(color: Color(0xFFdc2626), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -174,15 +198,17 @@ class _RegisterPageState extends State<RegisterPage> {
                             onTap: () async {
                               String username = _usernameController.text;
                               String password1 = _passwordController.text;
-                              String password2 = _confirmPasswordController.text;
+                              String password2 =
+                                  _confirmPasswordController.text;
 
                               final response = await request.postJson(
-                                  "http://localhost:8000/auth/register/",
-                                  jsonEncode({
-                                    "username": username,
-                                    "password1": password1,
-                                    "password2": password2,
-                                  }));
+                                "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/auth/register/",
+                                jsonEncode({
+                                  "username": username,
+                                  "password1": password1,
+                                  "password2": password2,
+                                }),
+                              );
 
                               if (context.mounted) {
                                 if (response['status'] == 'success') {
@@ -194,13 +220,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const LoginPage()),
+                                      builder: (context) => const LoginPage(),
+                                    ),
                                   );
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(response['message'] ??
-                                          'Failed to register!'),
+                                      content: Text(
+                                        response['message'] ??
+                                            'Failed to register!',
+                                      ),
                                     ),
                                   );
                                 }
@@ -210,7 +239,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               height: 50,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFdc2626), Color(0xFF991b1b)],
+                                  colors: [
+                                    Color(0xFFdc2626),
+                                    Color(0xFF991b1b),
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [

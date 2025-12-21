@@ -10,7 +10,7 @@ import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'package:olrggmobile/users/screens/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  final int? userId; 
+  final int? userId;
 
   const ProfilePage({super.key, this.userId});
 
@@ -30,10 +30,12 @@ class _ProfilePageState extends State<ProfilePage> {
     _dataFuture = fetchProfileAndNews(request);
   }
 
-  Future<Map<String, dynamic>> fetchProfileAndNews(CookieRequest request) async {
+  Future<Map<String, dynamic>> fetchProfileAndNews(
+    CookieRequest request,
+  ) async {
     String profileUrl;
-    String baseUrl = 'http://localhost:8000'; 
-    
+    String baseUrl = 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id';
+
     if (widget.userId != null) {
       profileUrl = '$baseUrl/users/show_profile/${widget.userId}/?type=json';
     } else {
@@ -44,13 +46,15 @@ class _ProfilePageState extends State<ProfilePage> {
       final profileResponse = await request.get(profileUrl);
 
       if (profileResponse['status'] != 'success') {
-        throw Exception('Gagal memuat profil: ${profileResponse['message'] ?? "Unknown error"}');
+        throw Exception(
+          'Gagal memuat profil: ${profileResponse['message'] ?? "Unknown error"}',
+        );
       }
 
       final userProfile = UserProfile.fromJson(profileResponse['data']);
 
       final newsResponse = await request.get(
-        '$baseUrl/users/load_news/?id=${userProfile.id}&type=json'
+        '$baseUrl/users/load_news/?id=${userProfile.id}&type=json',
       );
 
       List<NewsEntry> newsList = [];
@@ -60,23 +64,36 @@ class _ProfilePageState extends State<ProfilePage> {
         }
       }
 
-      return {
-        'profile': userProfile,
-        'news': newsList,
-      };
+      return {'profile': userProfile, 'news': newsList};
     } catch (e) {
       rethrow;
     }
   }
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
   // buat popup report
-  void _showReportDialog(BuildContext context, String targetUserId, String username) {
+  void _showReportDialog(
+    BuildContext context,
+    String targetUserId,
+    String username,
+  ) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -128,18 +145,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   final request = context.read<CookieRequest>();
-                  
+
                   try {
                     final response = await request.post(
-                      'http://localhost:8000/users/report_user/$targetUserId/',
-                      {
-                        'reason': _reportReason,
-                      }
+                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/report_user/$targetUserId/',
+                      {'reason': _reportReason},
                     );
 
                     if (context.mounted) {
-                      Navigator.of(context).pop(); 
-                      
+                      Navigator.of(context).pop();
+
                       if (response['status'] == 'success') {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -148,9 +163,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         );
                       } else {
-                        String errMessage = response['message'] ?? "Terjadi kesalahan";
+                        String errMessage =
+                            response['message'] ?? "Terjadi kesalahan";
                         if (response['errors'] != null) {
-                           errMessage = "Isian form tidak valid.";
+                          errMessage = "Isian form tidak valid.";
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -164,7 +180,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     if (context.mounted) {
                       Navigator.of(context).pop();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Error: $e"), backgroundColor: Colors.red),
+                        SnackBar(
+                          content: Text("Error: $e"),
+                          backgroundColor: Colors.red,
+                        ),
                       );
                     }
                   }
@@ -207,20 +226,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
           final UserProfile user = snapshot.data!['profile'];
           final List<NewsEntry> newsList = snapshot.data!['news'];
-          
+
           String? currentUser = request.jsonData['username'];
           String? currentRole = request.jsonData['role'];
           bool isAdmin = currentRole == "admin";
-          bool isOwner = widget.userId == null || (currentUser != null && user.username == currentUser);
+          bool isOwner =
+              widget.userId == null ||
+              (currentUser != null && user.username == currentUser);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(16, 24, 16, 40),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch, 
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 24,
+                    horizontal: 16,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -240,50 +263,71 @@ class _ProfilePageState extends State<ProfilePage> {
                           CircleAvatar(
                             radius: 50,
                             backgroundColor: Colors.grey[200],
-                            backgroundImage: () {
-                              String url = user.profilePictureUrl;
+                            backgroundImage:
+                                () {
+                                      String url = user.profilePictureUrl;
 
-                              if (url.isEmpty) {
-                                return const AssetImage('images/default_profile_picture.jpg');
-                              }
+                                      if (url.isEmpty) {
+                                        return const AssetImage(
+                                          'images/default_profile_picture.jpg',
+                                        );
+                                      }
 
-                              if (url.startsWith('http')) {
-                                return CachedNetworkImageProvider(
-                                    'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(url)}'
-                                );
-                              }
+                                      if (url.startsWith('http')) {
+                                        return CachedNetworkImageProvider(
+                                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}',
+                                        );
+                                      } else {
+                                        if (!url.startsWith('/')) url = '/$url';
 
-                              else {
-                                if (!url.startsWith('/')) url = '/$url';
-
-                                return CachedNetworkImageProvider('http://localhost:8000$url');
-                              }
-                            }() as ImageProvider,
+                                        return CachedNetworkImageProvider(
+                                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url',
+                                        );
+                                      }
+                                    }()
+                                    as ImageProvider,
 
                             onBackgroundImageError: (_, __) {
-                              print("Gagal load image: ${user.profilePictureUrl}");
+                              print(
+                                "Gagal load image: ${user.profilePictureUrl}",
+                              );
                             },
                           ),
-                          
+
                           // edit klo owner
                           if (isOwner)
                             Container(
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                boxShadow: [BoxShadow(blurRadius: 2, color: Colors.black26)]
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2,
+                                    color: Colors.black26,
+                                  ),
+                                ],
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.edit, color: Colors.blueAccent, size: 20),
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.blueAccent,
+                                  size: 20,
+                                ),
                                 onPressed: () async {
                                   final result = await Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context) => EditProfilePage(user: user)),
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EditProfilePage(user: user),
+                                    ),
                                   );
                                   if (result == true) {
                                     setState(() {
-                                      final request = context.read<CookieRequest>();
-                                      _dataFuture = fetchProfileAndNews(request);
+                                      final request = context
+                                          .read<CookieRequest>();
+                                      _dataFuture = fetchProfileAndNews(
+                                        request,
+                                      );
                                     });
                                   }
                                 },
@@ -296,22 +340,35 @@ class _ProfilePageState extends State<ProfilePage> {
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 shape: BoxShape.circle,
-                                boxShadow: [BoxShadow(blurRadius: 2, color: Colors.black26)]
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 2,
+                                    color: Colors.black26,
+                                  ),
+                                ],
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.flag, color: Colors.red, size: 20),
+                                icon: const Icon(
+                                  Icons.flag,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
                                 tooltip: "Report User",
                                 onPressed: () {
                                   final request = context.read<CookieRequest>();
-                                  _showReportDialog(context, user.id, user.username);
+                                  _showReportDialog(
+                                    context,
+                                    user.id,
+                                    user.username,
+                                  );
                                 },
                               ),
                             ),
                         ],
                       ),
-                      
+
                       const SizedBox(height: 16),
-                      
+
                       // full name
                       Text(
                         user.fullName,
@@ -322,7 +379,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           color: Colors.black87,
                         ),
                       ),
-                      
+
                       const SizedBox(height: 8),
 
                       // username ama role
@@ -331,11 +388,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Text(
                             "@${user.username}",
-                            style: TextStyle(fontSize: 15, color: Colors.grey[600]),
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.grey[600],
+                            ),
                           ),
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.red[600],
                               borderRadius: BorderRadius.circular(12),
@@ -353,15 +416,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
 
                       const SizedBox(height: 20),
-                      
+
                       // join kapan ama strike brp
                       const Divider(),
                       const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildStatColumn("Joined", _formatDate(DateTime.parse(user.dateJoined))),
-                          Container(height: 30, width: 1, color: Colors.grey[300]),
+                          _buildStatColumn(
+                            "Joined",
+                            _formatDate(DateTime.parse(user.dateJoined)),
+                          ),
+                          Container(
+                            height: 30,
+                            width: 1,
+                            color: Colors.grey[300],
+                          ),
                           if (isOwner || isAdmin)
                             _buildStatColumn("Strikes", "${user.strikes}"),
                         ],
@@ -382,12 +452,22 @@ class _ProfilePageState extends State<ProfilePage> {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 3)),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(0, 3),
+                      ),
                     ],
                   ),
                   child: Text(
-                    user.bio.isNotEmpty ? user.bio : "This user has not added a bio yet.",
-                    style: TextStyle(color: Colors.grey[800], height: 1.5, fontSize: 15),
+                    user.bio.isNotEmpty
+                        ? user.bio
+                        : "This user has not added a bio yet.",
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      height: 1.5,
+                      fontSize: 15,
+                    ),
                   ),
                 ),
 
@@ -398,7 +478,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 12),
 
                 if (newsList.isEmpty)
-                   Container(
+                  Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -407,9 +487,16 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Column(
                       children: [
-                        Icon(Icons.newspaper, size: 40, color: Colors.grey[300]),
+                        Icon(
+                          Icons.newspaper,
+                          size: 40,
+                          color: Colors.grey[300],
+                        ),
                         const SizedBox(height: 8),
-                        const Text("Belum ada berita.", style: TextStyle(color: Colors.grey)),
+                        const Text(
+                          "Belum ada berita.",
+                          style: TextStyle(color: Colors.grey),
+                        ),
                       ],
                     ),
                   )
@@ -420,14 +507,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     itemCount: newsList.length,
                     itemBuilder: (context, index) {
                       final news = newsList[index];
-                      
+
                       // thumbnail
                       String thumbnailUrl = "";
-                      if (news.thumbnail.isNotEmpty && !news.thumbnail.contains("default")) {
+                      if (news.thumbnail.isNotEmpty &&
+                          !news.thumbnail.contains("default")) {
                         if (news.thumbnail.startsWith('http')) {
-                           thumbnailUrl = news.thumbnail.replaceAll('localhost', 'localhost');
+                          thumbnailUrl = news.thumbnail.replaceAll(
+                            'localhost',
+                            'localhost',
+                          );
                         } else {
-                           thumbnailUrl = 'http://localhost:8000${news.thumbnail}';
+                          thumbnailUrl =
+                              'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id${news.thumbnail}';
                         }
                       }
 
@@ -436,7 +528,11 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: [
-                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6, offset: const Offset(0, 3)),
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 6,
+                              offset: const Offset(0, 3),
+                            ),
                           ],
                         ),
                         child: Material(
@@ -444,47 +540,81 @@ class _ProfilePageState extends State<ProfilePage> {
                           borderRadius: BorderRadius.circular(16),
                           clipBehavior: Clip.antiAlias,
                           child: InkWell(
-                            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => NewsDetailPage(news: news))),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    NewsDetailPage(news: news),
+                              ),
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ListTile(
                                   contentPadding: const EdgeInsets.all(12),
                                   leading: Container(
-                                    width: 70, 
+                                    width: 70,
                                     height: 70,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[200],
                                       borderRadius: BorderRadius.circular(12),
                                       image: thumbnailUrl.isNotEmpty
-                                          ? DecorationImage(image: NetworkImage(thumbnailUrl), fit: BoxFit.cover)
+                                          ? DecorationImage(
+                                              image: NetworkImage(thumbnailUrl),
+                                              fit: BoxFit.cover,
+                                            )
                                           : null,
                                     ),
                                     child: thumbnailUrl.isEmpty
-                                        ? const Icon(Icons.article, color: Colors.grey)
+                                        ? const Icon(
+                                            Icons.article,
+                                            color: Colors.grey,
+                                          )
                                         : null,
                                   ),
                                   title: Text(
                                     news.title,
                                     maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 15,
+                                    ),
                                   ),
                                   subtitle: Padding(
                                     padding: const EdgeInsets.only(top: 6.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 3,
+                                          ),
                                           decoration: BoxDecoration(
                                             color: Colors.blue[50],
-                                            borderRadius: BorderRadius.circular(6),
+                                            borderRadius: BorderRadius.circular(
+                                              6,
+                                            ),
                                           ),
-                                          child: Text(news.category, style: TextStyle(fontSize: 11, color: Colors.blue[800], fontWeight: FontWeight.bold)),
+                                          child: Text(
+                                            news.category,
+                                            style: TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.blue[800],
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
                                         ),
                                         const SizedBox(height: 4),
-                                        Text(_formatDate(news.createdAt), style: TextStyle(fontSize: 12, color: Colors.grey[500])),
+                                        Text(
+                                          _formatDate(news.createdAt),
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey[500],
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -492,7 +622,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               ],
                             ),
                           ),
-                        )
+                        ),
                       );
                     },
                   ),
@@ -524,7 +654,14 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget _buildStatColumn(String label, String value) {
     return Column(
       children: [
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
         const SizedBox(height: 4),
         Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
       ],

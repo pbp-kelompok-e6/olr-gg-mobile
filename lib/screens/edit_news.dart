@@ -39,9 +39,7 @@ class _EditNewsPageState extends State<EditNewsPage> {
       filled: true,
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
     );
   }
 
@@ -61,10 +59,7 @@ class _EditNewsPageState extends State<EditNewsPage> {
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        title: const Text("Edit News"),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text("Edit News"), centerTitle: true),
       body: Center(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -93,18 +88,16 @@ class _EditNewsPageState extends State<EditNewsPage> {
                       const SizedBox(height: 6),
                       const Text(
                         "Update your news and share with the community",
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                       const Divider(height: 32),
 
                       TextFormField(
                         initialValue: _title,
                         decoration: inputStyle("Title", "Enter news title"),
-                        validator: (v) =>
-                        (v == null || v.isEmpty) ? "Title cannot be empty" : null,
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? "Title cannot be empty"
+                            : null,
                         onChanged: (v) => _title = v,
                       ),
                       const SizedBox(height: 16),
@@ -113,8 +106,9 @@ class _EditNewsPageState extends State<EditNewsPage> {
                         initialValue: _content,
                         maxLines: 5,
                         decoration: inputStyle("Content", "Enter news content"),
-                        validator: (v) =>
-                        (v == null || v.isEmpty) ? "Content cannot be empty" : null,
+                        validator: (v) => (v == null || v.isEmpty)
+                            ? "Content cannot be empty"
+                            : null,
                         onChanged: (v) => _content = v,
                       ),
                       const SizedBox(height: 16),
@@ -131,14 +125,13 @@ class _EditNewsPageState extends State<EditNewsPage> {
                             ),
                           ),
                           ..._categories.map(
-                                (c) => DropdownMenuItem(
+                            (c) => DropdownMenuItem(
                               value: c,
                               child: Text(c[0].toUpperCase() + c.substring(1)),
                             ),
                           ),
                         ],
-                        validator: (v) =>
-                        v == null ? "Pilih kategori" : null,
+                        validator: (v) => v == null ? "Pilih kategori" : null,
                         onChanged: (v) {
                           setState(() {
                             _category = v;
@@ -158,14 +151,14 @@ class _EditNewsPageState extends State<EditNewsPage> {
                       const SizedBox(height: 16),
 
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: Colors.black,
-                            width: 1.2,
-                          ),
+                          border: Border.all(color: Colors.black, width: 1.2),
                         ),
                         child: SwitchListTile(
                           contentPadding: EdgeInsets.zero,
@@ -195,7 +188,7 @@ class _EditNewsPageState extends State<EditNewsPage> {
                                 Navigator.pop(context);
                               },
                               style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.black
+                                foregroundColor: Colors.black,
                               ),
                               child: const Text("Cancel"),
                             ),
@@ -206,13 +199,15 @@ class _EditNewsPageState extends State<EditNewsPage> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red[700],
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                               ),
                               onPressed: () async {
                                 if (!_formKey.currentState!.validate()) return;
 
                                 final response = await request.postJson(
-                                  "http://localhost:8000/news/${widget.news.id}/edit-flutter/",
+                                  "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/news/${widget.news.id}/edit-flutter/",
                                   jsonEncode({
                                     "title": _title,
                                     "content": _content,
@@ -225,15 +220,26 @@ class _EditNewsPageState extends State<EditNewsPage> {
                                 if (context.mounted) {
                                   if (response["status"] == "success") {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Berita berhasil diedit!")),
+                                      const SnackBar(
+                                        content: Text(
+                                          "Berita berhasil diedit!",
+                                        ),
+                                      ),
                                     );
                                     Navigator.pushReplacement(
                                       context,
-                                      MaterialPageRoute(builder: (context) => NewsEntryListPage()),
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            NewsEntryListPage(),
+                                      ),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text("Gagal mengedit, coba lagi.")),
+                                      const SnackBar(
+                                        content: Text(
+                                          "Gagal mengedit, coba lagi.",
+                                        ),
+                                      ),
                                     );
                                   }
                                 }

@@ -212,7 +212,7 @@ class _EditNewsPageState extends State<EditNewsPage> {
                                 if (!_formKey.currentState!.validate()) return;
 
                                 final response = await request.postJson(
-                                  "http://localhost:8000/news/${widget.news.id}/edit-flutter/",
+                                  "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/news/${widget.news.id}/edit-flutter/",
                                   jsonEncode({
                                     "title": _title,
                                     "content": _content,

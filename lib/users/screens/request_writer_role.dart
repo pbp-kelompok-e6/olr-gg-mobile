@@ -90,7 +90,7 @@ class _RequestWriterPageState extends State<RequestWriterPage> {
                         setState(() { _isLoading = true; });
                         try {
                           final response = await request.post(
-                            "http://localhost:8000/users/api/request-writer-role/",
+                            "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/api/request-writer-role/",
                             {
                               'reason': _reason,
                             },

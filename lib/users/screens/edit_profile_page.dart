@@ -63,7 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     String existingImageUrl = widget.user.profilePictureUrl;
     if (!existingImageUrl.startsWith('http')) {
-        existingImageUrl = "http://localhost:8000$existingImageUrl";
+        existingImageUrl = "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$existingImageUrl";
     }
 
 
@@ -172,7 +172,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       const SnackBar(content: Text("Sedang menyimpan data...")),
                     );
 
-                    String url = "http://localhost:8000/users/edit_profile_flutter/";
+                    String url = "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/edit_profile_flutter/";
 
                     try {
                       var requestMultipart = http.MultipartRequest('POST', Uri.parse(url));

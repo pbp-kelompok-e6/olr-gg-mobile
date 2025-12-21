@@ -207,7 +207,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                                 if (_formKey.currentState!.validate()) {
                                   final response =
                                   await request.postJson(
-                                    "http://localhost:8000/create-flutter/",
+                                    "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/create-flutter/",
                                     jsonEncode({
                                       "title": _title,
                                       "content": _content,

@@ -64,7 +64,7 @@ class NewsEntryCard extends StatelessWidget {
                     child: AspectRatio(
                       aspectRatio: 16 / 9,
                       child: Image.network(
-                        'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
+                        'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stack) => Container(
                           color: Colors.grey.shade200,
@@ -216,7 +216,7 @@ class NewsEntryCard extends StatelessWidget {
                                   );
                                   if (shouldDelete != true) return;
                                   final response = await request.post(
-                                    "http://localhost:8000/news/${news.id}/delete-flutter/",
+                                    "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/news/${news.id}/delete-flutter/",
                                     {},
                                   );
                                   if (response['success'] == true) {

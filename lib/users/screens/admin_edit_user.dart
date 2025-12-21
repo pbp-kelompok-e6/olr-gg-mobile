@@ -63,7 +63,7 @@ class _AdminEditUserPageState extends State<AdminEditUserPage> {
 
     setState(() => _isLoading = true);
 
-    final String url = "http://localhost:8000/users/admin-dashboard/edit-user/${widget.userId}/";
+    final String url = "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/edit-user/${widget.userId}/";
 
     try {
       final response = await request.post(url, {

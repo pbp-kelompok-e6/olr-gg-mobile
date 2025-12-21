@@ -47,7 +47,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
     }
 
     try {
-      final response = await request.get('http://localhost:8000/users/admin-dashboard/?type=json');
+      final response = await request.get('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/?type=json');
       
       if (response['status'] == 'success') {
         setState(() {
@@ -66,7 +66,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
 
   Future<void> resetStrikes(int userId, CookieRequest request) async {
     try {
-      final response = await request.post('http://localhost:8000/users/admin-dashboard/reset-strikes/$userId/', {});
+      final response = await request.post('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/reset-strikes/$userId/', {});
       if (response['status'] == 'success') {
         if(mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Strikes direset!")));
         fetchAdminData(request);
@@ -78,8 +78,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
 
   Future<void> handleReport(int id, String action, CookieRequest request) async {
     final url = action == 'accept' 
-      ? 'http://localhost:8000/users/admin-dashboard/accept-report/$id/'
-      : 'http://localhost:8000/users/admin-dashboard/delete-report/$id/';
+      ? 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/accept-report/$id/'
+      : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/delete-report/$id/';
     
     try {
       final response = await request.post(url, {});
@@ -94,8 +94,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> with SingleTick
 
   Future<void> handleWriterRequest(int id, String action, CookieRequest request) async {
     final url = action == 'approve'
-      ? 'http://localhost:8000/users/admin-dashboard/approve-writer/$id/'
-      : 'http://localhost:8000/users/admin-dashboard/reject-writer/$id/';
+      ? 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/approve-writer/$id/'
+      : 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/admin-dashboard/reject-writer/$id/';
 
     try {
       final response = await request.post(url, {});
@@ -252,12 +252,12 @@ class _UserListTabState extends State<_UserListTab> with AutomaticKeepAliveClien
 
                             if (url.startsWith('http')) {
                               return CachedNetworkImageProvider(
-                                  'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(url)}'
+                                  'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}'
                               );
                             }
                             else {
                               if (!url.startsWith('/')) url = '/$url';
-                              return CachedNetworkImageProvider('http://localhost:8000$url');
+                              return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url');
                             }
                           }() as ImageProvider,
 

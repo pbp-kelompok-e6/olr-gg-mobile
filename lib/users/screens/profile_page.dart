@@ -32,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<Map<String, dynamic>> fetchProfileAndNews(CookieRequest request) async {
     String profileUrl;
-    String baseUrl = 'http://localhost:8000'; 
+    String baseUrl = 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id'; 
     
     if (widget.userId != null) {
       profileUrl = '$baseUrl/users/show_profile/${widget.userId}/?type=json';
@@ -131,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   
                   try {
                     final response = await request.post(
-                      'http://localhost:8000/users/report_user/$targetUserId/',
+                      'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/report_user/$targetUserId/',
                       {
                         'reason': _reportReason,
                       }
@@ -249,14 +249,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
                               if (url.startsWith('http')) {
                                 return CachedNetworkImageProvider(
-                                    'http://localhost:8000/proxy-image/?url=${Uri.encodeComponent(url)}'
+                                    'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(url)}'
                                 );
                               }
 
                               else {
                                 if (!url.startsWith('/')) url = '/$url';
 
-                                return CachedNetworkImageProvider('http://localhost:8000$url');
+                                return CachedNetworkImageProvider('https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$url');
                               }
                             }() as ImageProvider,
 
@@ -427,7 +427,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         if (news.thumbnail.startsWith('http')) {
                            thumbnailUrl = news.thumbnail.replaceAll('localhost', 'localhost');
                         } else {
-                           thumbnailUrl = 'http://localhost:8000${news.thumbnail}';
+                           thumbnailUrl = 'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id${news.thumbnail}';
                         }
                       }
 

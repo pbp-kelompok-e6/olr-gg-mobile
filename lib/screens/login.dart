@@ -45,7 +45,10 @@ class _LoginPageState extends State<LoginPage> {
                     offset: const Offset(0, 10),
                   ),
                 ],
-                border: Border.all(color: Colors.red.shade200.withOpacity(0.3), width: 1),
+                border: Border.all(
+                  color: Colors.red.shade200.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -70,7 +73,11 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ],
                           ),
-                          child: const Icon(Icons.sports_soccer, color: Colors.white, size: 32),
+                          child: const Icon(
+                            Icons.sports_soccer,
+                            color: Colors.white,
+                            size: 32,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         const Text(
@@ -84,7 +91,10 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 6),
                         const Text(
                           'Enter your credentials to access your account',
-                          style: TextStyle(color: Color(0xFF6b7280), fontSize: 14),
+                          style: TextStyle(
+                            color: Color(0xFF6b7280),
+                            fontSize: 14,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -92,23 +102,35 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const Divider(height: 1, color: Colors.transparent),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 24,
+                    ),
                     child: Column(
                       children: [
                         TextField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             hintText: 'Enter your username',
-                            prefixIcon: const Icon(Icons.person_outline, color: Color(0xFF9ca3af)),
+                            prefixIcon: const Icon(
+                              Icons.person_outline,
+                              color: Color(0xFF9ca3af),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFf9fafb),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFe5e7eb), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFdc2626), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -118,16 +140,25 @@ class _LoginPageState extends State<LoginPage> {
                           obscureText: true,
                           decoration: InputDecoration(
                             hintText: 'Enter your password',
-                            prefixIcon: const Icon(Icons.lock_outline, color: Color(0xFF9ca3af)),
+                            prefixIcon: const Icon(
+                              Icons.lock_outline,
+                              color: Color(0xFF9ca3af),
+                            ),
                             filled: true,
                             fillColor: const Color(0xFFf9fafb),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFe5e7eb), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Color(0xFFdc2626), width: 2),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
@@ -139,10 +170,10 @@ class _LoginPageState extends State<LoginPage> {
                               String username = _usernameController.text;
                               String password = _passwordController.text;
 
-                              final response = await request.login("http://localhost:8000/auth/login/", {
-                                'username': username,
-                                'password': password,
-                              });
+                              final response = await request.login(
+                                "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/auth/login/",
+                                {'username': username, 'password': password},
+                              );
 
                               if (request.loggedIn) {
                                 String message = response['message'];
@@ -153,12 +184,18 @@ class _LoginPageState extends State<LoginPage> {
                                 if (context.mounted) {
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (context) => MyHomePage()),
+                                    MaterialPageRoute(
+                                      builder: (context) => MyHomePage(),
+                                    ),
                                   );
                                   ScaffoldMessenger.of(context)
                                     ..hideCurrentSnackBar()
                                     ..showSnackBar(
-                                      SnackBar(content: Text("$message Welcome, $uname.")),
+                                      SnackBar(
+                                        content: Text(
+                                          "$message Welcome, $uname.",
+                                        ),
+                                      ),
                                     );
                                 }
                               } else {
@@ -185,7 +222,10 @@ class _LoginPageState extends State<LoginPage> {
                               height: 50,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFdc2626), Color(0xFF991b1b)],
+                                  colors: [
+                                    Color(0xFFdc2626),
+                                    Color(0xFF991b1b),
+                                  ],
                                 ),
                                 borderRadius: BorderRadius.circular(12),
                                 boxShadow: [

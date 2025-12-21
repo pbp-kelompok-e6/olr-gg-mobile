@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http; 
-import 'package:image_picker/image_picker.dart'; 
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/users/models/user_profile.dart';
@@ -48,7 +48,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   // fungsi image picker buat ambil data dari galeri
   Future<void> _pickImage() async {
-    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
 
     if (pickedFile != null) {
       setState(() {
@@ -63,9 +65,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     String existingImageUrl = widget.user.profilePictureUrl;
     if (!existingImageUrl.startsWith('http')) {
-        existingImageUrl = "http://localhost:8000$existingImageUrl";
+      existingImageUrl =
+          "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id$existingImageUrl";
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -90,7 +92,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ? FileImage(_image!)
                           : NetworkImage(existingImageUrl) as ImageProvider,
                       child: _image == null && existingImageUrl.isEmpty
-                          ? const Icon(Icons.person, size: 60, color: Colors.grey)
+                          ? const Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.grey,
+                            )
                           : null,
                     ),
                     Positioned(
@@ -172,48 +178,67 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       const SnackBar(content: Text("Sedang menyimpan data...")),
                     );
 
-                    String url = "http://localhost:8000/users/edit_profile_flutter/";
+                    String url =
+                        "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/edit_profile_flutter/";
 
                     try {
-                      var requestMultipart = http.MultipartRequest('POST', Uri.parse(url));
-                      requestMultipart.fields['first_name'] = _firstNameController.text;
-                      requestMultipart.fields['last_name'] = _lastNameController.text;
+                      var requestMultipart = http.MultipartRequest(
+                        'POST',
+                        Uri.parse(url),
+                      );
+                      requestMultipart.fields['first_name'] =
+                          _firstNameController.text;
+                      requestMultipart.fields['last_name'] =
+                          _lastNameController.text;
                       requestMultipart.fields['bio'] = _bioController.text;
 
                       if (_image != null) {
-                        requestMultipart.files.add(await http.MultipartFile.fromPath(
-                          'profile_picture',
-                          _image!.path,
-                        ));
+                        requestMultipart.files.add(
+                          await http.MultipartFile.fromPath(
+                            'profile_picture',
+                            _image!.path,
+                          ),
+                        );
                       }
 
                       requestMultipart.headers.addAll(request.headers);
 
                       var response = await requestMultipart.send();
 
-                      var responseString = await response.stream.bytesToString();
+                      var responseString = await response.stream
+                          .bytesToString();
                       var responseData = jsonDecode(responseString);
 
                       if (context.mounted) {
-                        if (response.statusCode == 200 && responseData['status'] == 'success') {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                            content: Text("Profil berhasil diperbarui!"),
-                            backgroundColor: Colors.green,
-                          ));
+                        if (response.statusCode == 200 &&
+                            responseData['status'] == 'success') {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("Profil berhasil diperbarui!"),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
                           Navigator.pop(context, true);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(responseData['message'] ?? "Gagal update profile."),
-                            backgroundColor: Colors.red,
-                          ));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                responseData['message'] ??
+                                    "Gagal update profile.",
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
                         }
                       }
                     } catch (e) {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text("Error: $e"),
-                          backgroundColor: Colors.red,
-                        ));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text("Error: $e"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     }
                   }

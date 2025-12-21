@@ -122,7 +122,7 @@ class _NewsFormPageState extends State<NewsFormPage> {
                         ],
                         validator: (value) {
                           if (value == null) {
-                            return "Pilih kategori";
+                            return "Choose Category";
                           }
                           return null;
                         },

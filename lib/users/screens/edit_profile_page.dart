@@ -244,7 +244,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                 },
                 child: const Text(
-                  "Simpan Perubahan",
+                  "Save",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

@@ -131,7 +131,8 @@ class _EditNewsPageState extends State<EditNewsPage> {
                             ),
                           ),
                         ],
-                        validator: (v) => v == null ? "Pilih kategori" : null,
+                        validator: (v) =>
+                        v == null ? "Choose Category" : null,
                         onChanged: (v) {
                           setState(() {
                             _category = v;
@@ -244,7 +245,7 @@ class _EditNewsPageState extends State<EditNewsPage> {
                                   }
                                 }
                               },
-                              child: const Text("Simpan Perubahan"),
+                              child: const Text("Save"),
                             ),
                           ),
                         ],

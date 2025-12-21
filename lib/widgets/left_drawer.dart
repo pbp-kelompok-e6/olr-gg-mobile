@@ -8,6 +8,8 @@ import 'package:olrggmobile/screens/login.dart';
 import 'package:olrggmobile/users/screens/profile_page.dart';
 import 'package:olrggmobile/users/screens/admin_dashboard_page.dart';
 import 'package:olrggmobile/users/screens/request_writer_role.dart';
+import 'package:olrggmobile/forum/screens/forum_entry_list.dart';
+import 'package:olrggmobile/forum/screens/forumlist_form.dart';
 import 'package:olrggmobile/readinglist/screens/reading_list_page.dart';
 
 class LeftDrawer extends StatelessWidget {
@@ -17,7 +19,6 @@ class LeftDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
     final role = request.jsonData["role"];
-
     return Drawer(
       backgroundColor: const Color(0xFF0F1117),
       child: ListView(
@@ -170,8 +171,7 @@ class LeftDrawer extends StatelessWidget {
                 ),
               ],
             ),
-          ),
-
+          ),          
           if (request.loggedIn) // Hanya muncul jika login
             ListTile(
               leading: const Icon(
@@ -204,6 +204,30 @@ class LeftDrawer extends StatelessWidget {
                 context,
                 MaterialPageRoute(builder: (_) => const NewsFormPage()),
               ),
+            ),
+          // FORUM
+            ListTile(
+            leading: const Icon(Icons.chat, color: Colors.grey), 
+            title: const Text('Forum', style: TextStyle(color: Colors.grey)), 
+            hoverColor: Colors.white10, 
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ForumEntryListPage()),
+              );
+            },
+          ),
+          if (request.loggedIn)
+            ListTile(
+              leading: const Icon(Icons.add_comment, color: Colors.grey), 
+              title: const Text('Create Forum', style: TextStyle(color: Colors.grey)), 
+              hoverColor: Colors.white10, 
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ForumFormPage()),
+                );
+              },
             ),
           if (role == "reader" && role != "admin")
             ListTile(

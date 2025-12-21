@@ -5,6 +5,7 @@ import 'package:olrggmobile/screens/news_entry_list.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/screens/login.dart';
+import 'package:olrggmobile/readinglist/screens/reading_list_page.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -79,6 +80,17 @@ class LeftDrawer extends StatelessWidget {
               );
             },
           ),
+          if (request.loggedIn) // Only show if user is logged in
+            ListTile(
+              leading: const Icon(Icons.collections_bookmark),
+              title: const Text('My Reading Lists'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ReadingListPage()),
+                );
+              },
+            ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),

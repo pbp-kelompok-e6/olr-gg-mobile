@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:olrggmobile/models/news_entry.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import 'package:provider/provider.dart';
+import 'package:olrggmobile/readinglist/widgets/reading_list_dialog.dart';
 
 class NewsDetailPage extends StatelessWidget {
   final NewsEntry news;
@@ -15,12 +18,31 @@ class NewsDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>(); // Akses request
     return Scaffold(
       backgroundColor: Colors.yellow.shade300,
       appBar: AppBar(
         title: const Text('News content'),
         backgroundColor: Colors.yellow[700],
         foregroundColor: Colors.black,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.bookmark_add_outlined),
+          tooltip: "Add to Reading List",
+          onPressed: () {
+            if (!request.loggedIn) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Please login to save news.")),
+              );
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) => ReadingListDialog(newsId: news.id),
+              );
+            }
+          },
+        ),
+      ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -153,3 +175,4 @@ class NewsDetailPage extends StatelessWidget {
     );
   }
 }
+

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:olrggmobile/models/news_entry.dart';
+import 'package:olrggmobile/Rating/screens/ratings_section.dart';
 import 'package:olrggmobile/comments/screens/comments_section.dart';
 import 'package:olrggmobile/comments/screens/comment_form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -313,6 +314,9 @@ class NewsDetailPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
+                // Ratings Section
+                RatingsSection(newsId: news.id),
               ],
             ),
             CommentForm(

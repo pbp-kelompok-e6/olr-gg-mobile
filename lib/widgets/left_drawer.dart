@@ -75,16 +75,15 @@ class LeftDrawer extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => LoginPage()),
               ),
             ),
-
-          ListTile(
-              leading: const Icon(Icons.login, color: Colors.grey),
-              title: const Text("Login", style: TextStyle(color: Colors.grey)),
-              hoverColor: Colors.white10,
-              onTap: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => LoginPage()),
+            ListTile(
+                leading: const Icon(Icons.login, color: Colors.grey),
+                title: const Text("Register", style: TextStyle(color: Colors.grey)),
+                hoverColor: Colors.white10,
+                onTap: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => RegisterPage()),
+                ),
               ),
-            ),
           }
           Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),

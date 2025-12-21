@@ -327,7 +327,7 @@ class NewsDetailPage extends StatelessWidget {
             ),
             CommentsSection(key: commentsSectionKey, newsId: news.id)
           ],
-          ),
+          ),)
         ),
       ),
     );

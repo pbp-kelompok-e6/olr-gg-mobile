@@ -17,9 +17,6 @@ class CommentsSection extends StatefulWidget {
 
 
 class CommentsSectionState extends State<CommentsSection> {
-  String? _editingCommentId;
-  final _editFormKey = GlobalKey<FormState>();
-  final _editController = TextEditingController();
   final ValueNotifier<List<CommentEntry>> _commentsNotifier = ValueNotifier([]);
   bool _isLoading = true;
 
@@ -31,7 +28,6 @@ class CommentsSectionState extends State<CommentsSection> {
 
   @override
   void dispose() {
-    _editController.dispose();
     _commentsNotifier.dispose();
     super.dispose();
   }
@@ -63,133 +59,14 @@ class CommentsSectionState extends State<CommentsSection> {
   }
 
   void refreshComments() {
-    _editingCommentId = null;
     _loadComments();
-  }
-  void _startEditing(CommentEntry comment) {
-    setState(() {
-      _editingCommentId = comment.id;
-      _editController.text = comment.content;
-    });
-  }
-
-  void _cancelEditing() {
-    setState(() {
-      _editingCommentId = null;
-      _editController.clear();
-    });
-  }
-
-  Future<void> _saveEdit(String commentId) async {
-    if (!_editFormKey.currentState!.validate()) return;
-
-    final request = context.read<CookieRequest>();
-    final response = await request.postJson(
-      'http://localhost:8000/comments/$commentId/edit_flutter/',
-      jsonEncode({'content': _editController.text}),
-    );
-
-    if (mounted) {
-      if (response['status'] == 'success') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Comment updated successfully'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        refreshComments();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to update comment'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Widget _buildEditForm(CommentEntry comment) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.yellow.shade100,
-        border: Border.all(
-          color: Colors.blue.shade600,
-          width: 2,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Form(
-        key: _editFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Edit Comment',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: _cancelEditing,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _editController,
-              maxLines: 4,
-              decoration: InputDecoration(
-                hintText: 'Edit your comment...',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              validator: (value) =>
-              (value == null || value.isEmpty)
-                  ? 'Comment cannot be empty'
-                  : null,
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _cancelEditing,
-                  child: const Text('Cancel'),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => _saveEdit(comment.id),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Save'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.symmetric(vertical: 32),
         child: Center(child: CircularProgressIndicator()),
       );
     }
@@ -197,69 +74,145 @@ class CommentsSectionState extends State<CommentsSection> {
     return ValueListenableBuilder<List<CommentEntry>>(
       valueListenable: _commentsNotifier,
       builder: (context, comments, _) {
-        if (comments.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text('No comments yet.'),
-          );
-        }
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 12),
-            const Text('Comments', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: comments.length,
-              separatorBuilder: (_, __) => const Divider(),
-              itemBuilder: (context, i) {
-                final c = comments[i];
-                if (_editingCommentId == c.id) {
-                  return _buildEditForm(c);
-                }
+            const SizedBox(height: 24),
+            Text(
+              'Comments (${comments.length})',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 24),
+            if (comments.isEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 48),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 2,
+                    style: BorderStyle.solid,
+                  ),
+                ),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        '💬',
+                        style: TextStyle(fontSize: 48),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'No comments yet',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black54,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Be the first to share your thoughts!',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: comments.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 10),
 
-                return CommentEntryCard(
-                  comment: c,
-                  onEdit: () => _startEditing(c),
-                  onDelete: () async {
-                    final request = context.read<CookieRequest>();
-                    try {
-                      final response = await request.postJson(
-                          'http://localhost:8000/comments/${c.id}/delete_flutter/',
-                          jsonEncode({})
-                      );
+                itemBuilder: (context, i) {
+                  final c = comments[i];
 
-                      if (mounted) {
-                        if (response['status'] == 'success') {
-                          refreshComments(); // Only updates comments section
+                  return CommentEntryCard(
+                    comment: c,
+                    onSaveEdit: (newContent) async {
+                      final request = context.read<CookieRequest>();
+                      try {
+                        final response = await request.postJson(
+                          'http://localhost:8000/comments/${c.id}/edit_flutter/',
+                          jsonEncode({'content': newContent}),
+                        );
+
+                        if (mounted) {
+                          if (response['status'] == 'success') {
+                            refreshComments();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Comment updated successfully'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Failed to update comment'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Comment deleted successfully'),
-                              backgroundColor: Colors.green,
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
                             ),
                           );
                         }
                       }
-                    } catch (e) {
-                      if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Error: $e'),
-                            backgroundColor: Colors.red,
-                          ),
+                    },
+                    onDelete: () async {
+                      final request = context.read<CookieRequest>();
+                      try {
+                        final response = await request.postJson(
+                            'http://localhost:8000/comments/${c.id}/delete_flutter/',
+                            jsonEncode({})
                         );
+
+                        if (mounted) {
+                          if (response['status'] == 'success') {
+                            refreshComments();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Comment deleted successfully'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          }
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
                       }
-                    }
-                  },
-                );
-              },
-            ),
+                    },
+                  );
+                },
+
+              ),
           ],
         );
       },
     );
   }
+
 }

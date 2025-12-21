@@ -634,6 +634,7 @@ class _ReadingListPageState extends State<ReadingListPage> {
                                     userUsername: item.news.userUsername,
                                     userId: item.news.userId.toString(),
                                     isFeatured: false,
+                                    ratingCount: 0,
                                   );
 
                                   if (context.mounted) {

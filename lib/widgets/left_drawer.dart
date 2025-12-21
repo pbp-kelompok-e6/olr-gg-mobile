@@ -11,6 +11,7 @@ import 'package:olrggmobile/users/screens/request_writer_role.dart';
 import 'package:olrggmobile/forum/screens/forum_entry_list.dart';
 import 'package:olrggmobile/forum/screens/forumlist_form.dart';
 import 'package:olrggmobile/readinglist/screens/reading_list_page.dart';
+import 'package:olrggmobile/screens/register.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
@@ -65,7 +66,7 @@ class LeftDrawer extends StatelessWidget {
               MaterialPageRoute(builder: (_) => MyHomePage()),
             ),
           ),
-          if (request.loggedIn == false) {
+          if (request.loggedIn == false)
             ListTile(
               leading: const Icon(Icons.login, color: Colors.grey),
               title: const Text("Login", style: TextStyle(color: Colors.grey)),
@@ -75,16 +76,19 @@ class LeftDrawer extends StatelessWidget {
                 MaterialPageRoute(builder: (_) => LoginPage()),
               ),
             ),
+          if (request.loggedIn == false)
             ListTile(
-                leading: const Icon(Icons.login, color: Colors.grey),
-                title: const Text("Register", style: TextStyle(color: Colors.grey)),
-                hoverColor: Colors.white10,
-                onTap: () => Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => RegisterPage()),
-                ),
+              leading: const Icon(Icons.app_registration, color: Colors.grey),
+              title: const Text(
+                "Register",
+                style: TextStyle(color: Colors.grey),
               ),
-          }
+              hoverColor: Colors.white10,
+              onTap: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => RegisterPage()),
+              ),
+            ),
           Theme(
             data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
             child: ExpansionTile(

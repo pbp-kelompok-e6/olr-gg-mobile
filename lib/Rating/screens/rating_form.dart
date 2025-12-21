@@ -41,17 +41,17 @@ class _RatingFormPageState extends State<RatingFormPage> {
     final request = context.watch<CookieRequest>();
 
     return Scaffold(
-      backgroundColor: Colors.blue[300],
+      // backgroundColor: Colors.blue[300],
       appBar: AppBar(
         title: Text(
           isEditing ? "Edit Rating" : "Add Rating",
           style: const TextStyle(
-            color: Colors.black,
+            color: Colors.grey,
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
+        // backgroundColor: Colors.yellow[700],
+        // foregroundColor: Colors.black,
       ),
       body: Form(
         key: _formKey,
@@ -80,6 +80,9 @@ class _RatingFormPageState extends State<RatingFormPage> {
                       ),
                     ),
                     Slider(
+                      activeColor: Colors.yellow[700],
+                      thumbColor: Colors.yellow[700],
+                      inactiveColor: Colors.white,
                       value: _rating.toDouble(),
                       min: 1,
                       max: 5,

@@ -156,10 +156,56 @@ class NewsEntryCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _formatDate(news.createdAt),
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    Row(
+                      children: [
+                        Text(
+                          _formatDate(news.createdAt),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // TAMBAHAN: rating
+                        if (news.averageRating != null)
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: Colors.amber.shade600,
+                                size: 16,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                news.averageRating!.toStringAsFixed(1),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.amber.shade700,
+                                ),
+                              ),
+                              Text(
+                                ' (${news.ratingCount})',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          const Text(
+                            'No ratings yet',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                      ],
                     ),
+
                     const SizedBox(height: 4),
                     Text(
                       news.title,

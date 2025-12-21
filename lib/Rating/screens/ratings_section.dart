@@ -97,9 +97,9 @@ class _RatingsSectionState extends State<RatingsSection> {
       margin: const EdgeInsets.only(top: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.yellow.shade200,
+        // color: Colors.yellow.shade200,
         border: Border(
-          top: BorderSide(color: Colors.yellow.shade600, width: 2),
+          // top: BorderSide(color: Colors.yellow.shade600, width: 2),
         ),
       ),
       child: Column(

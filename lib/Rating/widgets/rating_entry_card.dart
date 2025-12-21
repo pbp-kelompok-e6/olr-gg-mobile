@@ -16,15 +16,27 @@ class RatingEntryCard extends StatelessWidget {
   });
 
   String _formatDate(DateTime date) {
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.yellow[200],
+      // color: Colors.yellow[200],
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
@@ -40,11 +52,7 @@ class RatingEntryCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
-                      Icons.person,
-                      size: 16,
-                      color: Colors.blue[700],
-                    ),
+                    Icon(Icons.person, size: 16, color: Colors.blue[700]),
                     const SizedBox(width: 4),
                     Text(
                       rating.userUsername,
@@ -79,18 +87,22 @@ class RatingEntryCard extends StatelessWidget {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Konfirmasi Hapus"),
-                                content: const Text("Apakah Anda yakin ingin menghapus rating ini?"),
+                                content: const Text(
+                                  "Apakah Anda yakin ingin menghapus rating ini?",
+                                ),
                                 actions: [
                                   TextButton(
                                     child: const Text("Batal"),
-                                    onPressed: () => Navigator.pop(context, false),
+                                    onPressed: () =>
+                                        Navigator.pop(context, false),
                                   ),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.red,
                                     ),
                                     child: const Text("Hapus"),
-                                    onPressed: () => Navigator.pop(context, true),
+                                    onPressed: () =>
+                                        Navigator.pop(context, true),
                                   ),
                                 ],
                               );
@@ -121,19 +133,13 @@ class RatingEntryCard extends StatelessWidget {
             // Review Text
             Text(
               rating.review,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-              ),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
             const SizedBox(height: 8),
             // Date
             Text(
               _formatDate(rating.createdAt),
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey[700],
-              ),
+              style: TextStyle(fontSize: 11, color: Colors.grey[700]),
             ),
           ],
         ),
@@ -141,4 +147,3 @@ class RatingEntryCard extends StatelessWidget {
     );
   }
 }
-

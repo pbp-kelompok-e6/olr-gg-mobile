@@ -86,9 +86,7 @@ class ForumEntryCard extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 12),
-
                 Text(
                   forum.title,
                   style: const TextStyle(
@@ -97,18 +95,14 @@ class ForumEntryCard extends StatelessWidget {
                     color: Colors.black87,
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
                   forum.content,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.grey[600], height: 1.5),
                 ),
-
                 const SizedBox(height: 16),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -134,7 +128,6 @@ class ForumEntryCard extends StatelessWidget {
                         ),
                       ],
                     ),
-
                     Row(
                       children: [
                         if (forum.userUsername == currentUser)
@@ -146,14 +139,29 @@ class ForumEntryCard extends StatelessWidget {
                             ),
                             constraints: const BoxConstraints(),
                             padding: const EdgeInsets.only(right: 8),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ForumEditPage(forum: forum),
-                                ),
+                            onPressed: () async {
+                              final result = await showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    ForumEditDialog(forum: forum),
                               );
+
+                              if (result == true && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      "Discussion updated successfully!",
+                                    ),
+                                  ),
+                                );
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const ForumEntryListPage(),
+                                  ),
+                                );
+                              }
                             },
                           ),
                         if (forum.userUsername == currentUser ||
@@ -170,39 +178,146 @@ class ForumEntryCard extends StatelessWidget {
                             onPressed: () async {
                               final shouldDelete = await showDialog<bool>(
                                 context: context,
-                                builder: (context) => AlertDialog(
+                                builder: (context) => Dialog(
                                   backgroundColor: Colors.white,
-                                  title: const Text(
-                                    "Delete Post?",
-                                    style: TextStyle(color: Colors.black),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
-                                  content: const Text(
-                                    "This action cannot be undone.",
+                                  insetPadding: const EdgeInsets.all(20),
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 400,
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(24.0),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.only(
+                                              bottom: 16,
+                                            ),
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.red.shade50,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              Icons.warning_amber_rounded,
+                                              color: Colors.red.shade600,
+                                              size: 32,
+                                            ),
+                                          ),
+                                          const Text(
+                                            "Delete Post",
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            "Are you sure you want to delete this discussion?",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            "This action cannot be undone.",
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: Colors.red[600],
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.red[600],
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    elevation: 0,
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 12,
+                                                        ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        context,
+                                                        true,
+                                                      ),
+                                                  child: const Text(
+                                                    "Delete",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Expanded(
+                                                child: OutlinedButton(
+                                                  style: OutlinedButton.styleFrom(
+                                                    foregroundColor:
+                                                        Colors.grey[700],
+                                                    side: BorderSide(
+                                                      color:
+                                                          Colors.grey.shade300,
+                                                    ),
+                                                    padding:
+                                                        const EdgeInsets.symmetric(
+                                                          vertical: 12,
+                                                        ),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                            8,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        context,
+                                                        false,
+                                                      ),
+                                                  child: const Text(
+                                                    "Cancel",
+                                                    style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      child: const Text("Cancel"),
-                                      onPressed: () =>
-                                          Navigator.pop(context, false),
-                                    ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                      ),
-                                      child: const Text(
-                                        "Delete",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      onPressed: () =>
-                                          Navigator.pop(context, true),
-                                    ),
-                                  ],
                                 ),
                               );
 
                               if (shouldDelete == true) {
                                 final response = await request.post(
-                                  "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/forum/ajax/delete-post/${forum.id}/",
+                                  "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id//forum/ajax/delete-post/${forum.id}/",
                                   {},
                                 );
                                 if (context.mounted &&

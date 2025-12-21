@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:olrggmobile/models/news_entry.dart';
+import 'package:olrggmobile/comments/screens/comments_section.dart';
+import 'package:olrggmobile/comments/screens/comment_form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/readinglist/widgets/reading_list_dialog.dart';
@@ -53,6 +55,7 @@ class NewsDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final commentsSectionKey = GlobalKey<CommentsSectionState>();
     final request = context.watch<CookieRequest>(); // Akses request
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -312,6 +315,14 @@ class NewsDetailPage extends StatelessWidget {
                 ),
               ],
             ),
+            CommentForm(
+              newsId: news.id,
+              onCommentAdded: () {
+                commentsSectionKey.currentState?.refreshComments();
+              },
+            ),
+            CommentsSection(key: commentsSectionKey, newsId: news.id)
+          ],
           ),
         ),
       ),

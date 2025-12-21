@@ -27,7 +27,6 @@ class _ForumEditPageState extends State<ForumEditPage> {
   @override
   void initState() {
     super.initState();
-    // Isi form dengan data lama
     _title = widget.forum.title;
     _category = widget.forum.category;
     _content = widget.forum.content;
@@ -36,112 +35,90 @@ class _ForumEditPageState extends State<ForumEditPage> {
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    
+
     return Scaffold(
-      backgroundColor: Colors.blue[50],
-      appBar: AppBar(
-        title: const Text('Edit Diskusi'),
-        backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
+      backgroundColor: Colors.white, 
+    appBar: AppBar(
+        title: const Text(
+          'Edit Discussion', 
+          style: TextStyle(color: Colors.grey) 
+        ),
+        backgroundColor: Colors.black, 
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.grey), 
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1), 
+          child: Container(color: Colors.grey[800], height: 1)
+        ),
       ),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children:[
+              const Text("Title", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
               TextFormField(
                 initialValue: _title,
                 decoration: InputDecoration(
-                  labelText: "Judul Diskusi",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
-                onChanged: (String? value) {
-                  setState(() { _title = value!; });
-                },
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) return "Judul tidak boleh kosong!";
-                  return null;
-                },
+                onChanged: (val) => setState(() => _title = val),
+                validator: (val) => val!.isEmpty ? "Title cannot be empty" : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              
+              const Text("Category", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
-                  labelText: "Kategori",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 value: _category,
-                items: _categories.map((cat) => DropdownMenuItem(
-                  value: cat,
-                  child: Text(cat[0].toUpperCase() + cat.substring(1)),
-                )).toList(),
-                onChanged: (String? newValue) {
-                  setState(() { _category = newValue!; });
-                },
+                items: _categories.map((cat) => DropdownMenuItem(value: cat, child: Text(cat.toUpperCase()))).toList(),
+                onChanged: (val) => setState(() => _category = val!),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+              
+              const Text("Description", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
               TextFormField(
                 initialValue: _content,
-                maxLines: 8,
+                maxLines: 10,
                 decoration: InputDecoration(
-                  labelText: "Isi Diskusi",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                  alignLabelWithHint: true,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.all(12),
                 ),
-                onChanged: (String? value) {
-                  setState(() { _content = value!; });
-                },
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) return "Isi tidak boleh kosong!";
-                  return null;
-                },
+                onChanged: (val) => setState(() => _content = val),
+                validator: (val) => val!.isEmpty ? "Description cannot be empty" : null,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
+              
               SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[700],
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.red[600],
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                        // URL Edit sesuai views.py
                         final response = await request.postJson(
                             "http://localhost:8000/forum/ajax/edit-post/${widget.forum.id}/",
-                            jsonEncode({
-                                "title": _title,
-                                "content": _content,
-                                "category": _category,
-                            }),
+                            jsonEncode({"title": _title, "content": _content, "category": _category}),
                         );
-
-                        if (context.mounted) {
-                            if (response['status'] == 'success') {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Diskusi berhasil diupdate!")),
-                                );
-                                // Kembali ke list dan refresh
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const ForumEntryListPage()),
-                                );
-                            } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Gagal update diskusi.")),
-                                );
-                            }
+                        if (context.mounted && response['status'] == 'success') {
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ForumEntryListPage()));
                         }
                     }
-                },
-                  child: const Text("Simpan Perubahan", style: TextStyle(color: Colors.white)),
+                  },
+                  child: const Text("Save", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

@@ -33,13 +33,19 @@ class ForumEntryCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-        child: Card(
-          color: Colors.white, 
-          shape: RoundedRectangleBorder(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.shade300),
+            border: Border.all(color: Colors.grey.shade200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              )
+            ],
           ),
-          elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -49,67 +55,74 @@ class ForumEntryCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.blue[100],
-                        borderRadius: BorderRadius.circular(8),
+                        color: Colors.blue[800], 
+                        borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         forum.category.toUpperCase(),
-                        style: TextStyle(
-                          color: Colors.blue[800],
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
+                        style: const TextStyle(
+                          color: Colors.white, 
+                          fontSize: 11, 
+                          fontWeight: FontWeight.bold
                         ),
                       ),
                     ),
                     Text(
                       _formatDate(forum.createdAt),
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      style: TextStyle(color: Colors.grey[500], fontSize: 12),
                     ),
                   ],
                 ),
+                
                 const SizedBox(height: 12),
+                
                 Text(
                   forum.title,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
+                
                 const SizedBox(height: 8),
+                
                 Text(
                   forum.content,
-                  maxLines: 3,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Colors.grey[800],
-                    fontSize: 14,
-                    height: 1.5,
-                  ),
+                  style: TextStyle(color: Colors.grey[600], height: 1.5),
                 ),
-                const SizedBox(height: 12),
+
+                const SizedBox(height: 16),
+                
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.person, size: 16, color: Colors.grey),
-                        const SizedBox(width: 4),
+                        CircleAvatar(
+                          radius: 10,
+                          backgroundColor: Colors.grey[200],
+                          child: Icon(Icons.person, size: 14, color: Colors.grey[500]),
+                        ),
+                        const SizedBox(width: 6),
                         Text(
                           forum.userUsername,
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
-                    
-                    // === BAGIAN TOMBOL EDIT DAN DELETE ===
+
                     Row(
                       children: [
-                        // Tombol Edit: Hanya untuk Pemilik Post
                         if (forum.userUsername == currentUser)
                           IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            icon: Icon(Icons.edit_outlined, size: 20, color: Colors.grey[600]),
+                            constraints: const BoxConstraints(),
+                            padding: const EdgeInsets.only(right: 8),
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -119,32 +132,28 @@ class ForumEntryCard extends StatelessWidget {
                               );
                             },
                           ),
-
-                        // Tombol Delete: Pemilik ATAU Admin
                         if (forum.userUsername == currentUser || 
-                            (role != null && role.toString().toLowerCase() == 'admin'))
+                           (role != null && role.toString().toLowerCase() == 'admin'))
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(Icons.delete_outline, size: 20, color: Colors.red[400]),
+                            constraints: const BoxConstraints(),
+                            padding: EdgeInsets.zero,
                             onPressed: () async {
                               final shouldDelete = await showDialog<bool>(
                                 context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text("Hapus Post"),
-                                    content: const Text("Yakin ingin menghapus diskusi ini?"),
-                                    actions: [
-                                      TextButton(
-                                        child: const Text("Batal"),
-                                        onPressed: () => Navigator.pop(context, false),
-                                      ),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                                        child: const Text("Hapus"),
-                                        onPressed: () => Navigator.pop(context, true),
-                                      ),
-                                    ],
-                                  );
-                                },
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  title: const Text("Delete Post?", style: TextStyle(color: Colors.black)),
+                                  content: const Text("This action cannot be undone."),
+                                  actions: [
+                                    TextButton(child: const Text("Cancel"), onPressed: () => Navigator.pop(context, false)),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                                      child: const Text("Delete", style: TextStyle(color: Colors.white)),
+                                      onPressed: () => Navigator.pop(context, true),
+                                    ),
+                                  ],
+                                ),
                               );
 
                               if (shouldDelete == true) {
@@ -152,21 +161,11 @@ class ForumEntryCard extends StatelessWidget {
                                   "http://localhost:8000/forum/ajax/delete-post/${forum.id}/",
                                   {},
                                 );
-                                
-                                if (context.mounted) {
-                                    if (response['status'] == 'success') {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Post berhasil dihapus")),
-                                      );
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const ForumEntryListPage()),
-                                      );
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(response['message'] ?? "Gagal menghapus")),
-                                      );
-                                    }
+                                if (context.mounted && response['status'] == 'success') {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text("Post deleted successfully")),
+                                    );
+                                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ForumEntryListPage()));
                                 }
                               }
                             },

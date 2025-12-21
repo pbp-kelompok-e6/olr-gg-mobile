@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:olrggmobile/widgets/left_drawer.dart'; // Import Drawer
+import 'package:olrggmobile/widgets/left_drawer.dart';
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
@@ -19,136 +19,100 @@ class _ForumFormPageState extends State<ForumFormPage> {
   String _content = "";
 
   final List<String> _categories = [
-    'soccer', 
-    'football', 
-    'basketball', 
-    'volleyball', 
-    'hockey', 
-    'baseball',
+    'soccer', 'football', 'basketball', 'volleyball', 'hockey', 'baseball',
   ];
 
   @override
   Widget build(BuildContext context) {
     final request = context.watch<CookieRequest>();
-    
+
     return Scaffold(
-      backgroundColor: Colors.blue[50],
-      appBar: AppBar(
-        title: const Text('Buat Diskusi Baru'),
-        backgroundColor: Colors.yellow[700],
-        foregroundColor: Colors.black,
+    appBar: AppBar(
+        title: const Text(
+          'Create New Discussion', 
+          style: TextStyle(color: Colors.grey) 
+        ),
+        backgroundColor: Colors.black, 
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.grey), 
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1), 
+          child: Container(color: Colors.grey[800], height: 1)
+        ),
       ),
-      // INI YANG KAMU MINTA:
-      drawer: const LeftDrawer(), 
-      
+      drawer: const LeftDrawer(),
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:[
+            children: [
+              const Text("Title", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
               TextFormField(
                 decoration: InputDecoration(
-                  labelText: "Judul Diskusi",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
-                onChanged: (String? value) {
-                  setState(() { _title = value!; });
-                },
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) return "Judul tidak boleh kosong!";
-                  return null;
-                },
+                onChanged: (val) => setState(() => _title = val),
+                validator: (val) => val == null || val.isEmpty ? "Title cannot be empty!" : null,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+
+              const Text("Category", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(
-                  labelText: "Kategori",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 ),
                 value: _category,
-                items: _categories.map((cat) => DropdownMenuItem(
-                  value: cat,
-                  child: Text(cat[0].toUpperCase() + cat.substring(1)),
-                )).toList(),
-                onChanged: (String? newValue) {
-                  setState(() { _category = newValue!; });
-                },
+                items: _categories.map((cat) => DropdownMenuItem(value: cat, child: Text(cat.toUpperCase()))).toList(),
+                onChanged: (val) => setState(() => _category = val!),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
+
+              const Text("Description", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
               TextFormField(
                 maxLines: 8,
                 decoration: InputDecoration(
-                  labelText: "Isi Diskusi",
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                  alignLabelWithHint: true,
+                  hintText: "Share your thoughts...",
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  contentPadding: const EdgeInsets.all(12),
                 ),
-                onChanged: (String? value) {
-                  setState(() { _content = value!; });
-                },
-                validator: (String? value) {
-                  if (value == null || value.isEmpty) return "Isi tidak boleh kosong!";
-                  return null;
-                },
+                onChanged: (val) => setState(() => _content = val),
+                validator: (val) => val == null || val.isEmpty ? "Description cannot be empty!" : null,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
+
               SizedBox(
                 width: double.infinity,
+                height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[700],
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    backgroundColor: Colors.red[600], 
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                        // [DEBUG] Cek apakah tombol terpencet
-                        print("Tombol ditekan, mengirim request...");
-
                         try {
                             final response = await request.postJson(
                                 "http://localhost:8000/forum/ajax/create-post/",
-                                jsonEncode({
-                                    "title": _title,
-                                    "content": _content,
-                                    "category": _category,
-                                }),
+                                jsonEncode({"title": _title, "content": _content, "category": _category}),
                             );
-
-                            // [DEBUG] Cek response dari server
-                            print("Response server: $response");
-
-                            if (context.mounted) {
-                                if (response['status'] == 'success') {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Diskusi berhasil dibuat!")),
-                                    );
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => const ForumEntryListPage()),
-                                    );
-                                } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Gagal membuat diskusi.")),
-                                    );
-                                }
+                            if (context.mounted && response['status'] == 'success') {
+                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Forum created successfully!")));
+                                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const ForumEntryListPage()));
                             }
                         } catch (e) {
-                            // [DEBUG] Tangkap error koneksi/server
-                            print("Terjadi Error: $e");
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Error: $e")),
-                            );
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
                         }
                     }
-                },
-                  child: const Text("Posting Diskusi", style: TextStyle(color: Colors.white)),
+                  },
+                  child: const Text("Post Forum", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

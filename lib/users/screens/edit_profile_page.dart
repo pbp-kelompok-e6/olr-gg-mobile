@@ -19,19 +19,16 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   final _formKey = GlobalKey<FormState>();
 
-  // Controller untuk input
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _bioController;
 
-  // Variabel untuk gambar
   File? _image;
   final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    // Memecah full name
     List<String> names = widget.user.fullName.split(" ");
     String firstName = names.isNotEmpty ? names.first : "";
     String lastName = names.length > 1 ? names.sublist(1).join(" ") : "";
@@ -49,7 +46,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
-  // Fungsi untuk mengambil gambar dari galeri
+  // fungsi image picker buat ambil data dari galeri
   Future<void> _pickImage() async {
     final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
@@ -66,7 +63,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     String existingImageUrl = widget.user.profilePictureUrl;
     if (!existingImageUrl.startsWith('http')) {
-        // Sesuaikan dengan base URL server kamu
         existingImageUrl = "http://localhost:8000$existingImageUrl";
     }
 
@@ -194,7 +190,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       requestMultipart.headers.addAll(request.headers);
 
                       var response = await requestMultipart.send();
-                      
+
                       var responseString = await response.stream.bytesToString();
                       var responseData = jsonDecode(responseString);
 
@@ -204,7 +200,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             content: Text("Profil berhasil diperbarui!"),
                             backgroundColor: Colors.green,
                           ));
-                          Navigator.pop(context, true); 
+                          Navigator.pop(context, true);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text(responseData['message'] ?? "Gagal update profile."),
@@ -223,7 +219,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   }
                 },
                 child: const Text(
-                  "Simpan Perubahan",
+                  "Save",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

@@ -6,11 +6,43 @@ import 'package:olrggmobile/comments/screens/comment_form.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
 import 'package:olrggmobile/readinglist/widgets/reading_list_dialog.dart';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
 
-class NewsDetailPage extends StatelessWidget {
+class NewsDetailPage extends StatefulWidget {
   final NewsEntry news;
 
   const NewsDetailPage({super.key, required this.news});
+
+  @override
+  State<NewsDetailPage> createState() => _NewsDetailPageState();
+}
+
+class _NewsDetailPageState extends State<NewsDetailPage> {
+  late NewsEntry currentNews;
+
+  @override
+  void initState() {
+    super.initState();
+    currentNews = widget.news;
+  }
+
+  Future<void> _refreshNewsData() async {
+    final request = context.read<CookieRequest>();
+    try {
+      final response = await request.get('http://localhost:8000/json/');
+      for (var d in response) {
+        if (d != null && d['id'] == currentNews.id) {
+          setState(() {
+            currentNews = NewsEntry.fromJson(d);
+          });
+          break;
+        }
+      }
+    } catch (e) {
+      print('Error refreshing news data: $e');
+    }
+  }
 
   String _formatDate(DateTime date) {
     final months = [
@@ -94,7 +126,7 @@ class NewsDetailPage extends StatelessWidget {
                         spacing: 8,
                         runSpacing: 4,
                         children: [
-                          if (news.isFeatured)
+                          if (currentNews.isFeatured)
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 12,
@@ -131,27 +163,29 @@ class NewsDetailPage extends StatelessWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: _getCategoryColor(news.category),
+                              color: _getCategoryColor(currentNews.category),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              news.category[0].toUpperCase() +
-                                  news.category.substring(1),
+                              currentNews.category[0].toUpperCase() +
+                                  currentNews.category.substring(1),
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: _getCategoryTextColor(news.category),
+                                color: _getCategoryTextColor(
+                                  currentNews.category,
+                                ),
                               ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    if (news.thumbnail.isNotEmpty)
+                    if (currentNews.thumbnail.isNotEmpty)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Image.network(
-                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(news.thumbnail)}',
+                          'https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/proxy-image/?url=${Uri.encodeComponent(currentNews.thumbnail)}',
                           width: double.infinity,
                           height: 250,
                           fit: BoxFit.contain,
@@ -171,7 +205,7 @@ class NewsDetailPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            news.title,
+                            currentNews.title,
                             style: const TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
@@ -188,7 +222,7 @@ class NewsDetailPage extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                _formatDate(news.createdAt),
+                                _formatDate(currentNews.createdAt),
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -201,7 +235,7 @@ class NewsDetailPage extends StatelessWidget {
                           const Divider(color: Colors.grey),
                           const SizedBox(height: 12),
                           Text(
-                            news.content,
+                            currentNews.content,
                             style: const TextStyle(
                               fontSize: 16,
                               height: 1.6,
@@ -254,7 +288,7 @@ class NewsDetailPage extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                news.userUsername,
+                                currentNews.userUsername,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
@@ -268,15 +302,21 @@ class NewsDetailPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     // Ratings Section
-                    RatingsSection(newsId: news.id),
+                    RatingsSection(
+                      newsId: currentNews.id,
+                      onRatingChanged: _refreshNewsData,
+                    ),
                     if (request.loggedIn)
                       CommentForm(
-                        newsId: news.id,
+                        newsId: currentNews.id,
                         onCommentAdded: () {
                           commentsSectionKey.currentState?.refreshComments();
                         },
                       ),
-                    CommentsSection(key: commentsSectionKey, newsId: news.id),
+                    CommentsSection(
+                      key: commentsSectionKey,
+                      newsId: currentNews.id,
+                    ),
                   ],
                 ),
                 Positioned(
@@ -297,7 +337,7 @@ class NewsDetailPage extends StatelessWidget {
                           showDialog(
                             context: context,
                             builder: (context) =>
-                                ReadingListDialog(newsId: news.id),
+                                ReadingListDialog(newsId: currentNews.id),
                           );
                         }
                       },

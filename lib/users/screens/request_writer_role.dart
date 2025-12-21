@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:pbp_django_auth/pbp_django_auth.dart';
 import 'package:provider/provider.dart';
-import 'package:olrggmobile/widgets/left_drawer.dart';
+import 'package:olrggmobile/widgets/left_drawer.dart'; 
 
 class RequestWriterPage extends StatefulWidget {
   const RequestWriterPage({super.key});
@@ -44,7 +44,7 @@ class _RequestWriterPageState extends State<RequestWriterPage> {
                 style: TextStyle(color: Colors.grey),
               ),
               const SizedBox(height: 20),
-
+              
               // input
               TextFormField(
                 decoration: InputDecoration(
@@ -68,9 +68,9 @@ class _RequestWriterPageState extends State<RequestWriterPage> {
                   return null;
                 },
               ),
-
+              
               const SizedBox(height: 24),
-
+              
               // submit
               SizedBox(
                 width: double.infinity,
@@ -83,79 +83,62 @@ class _RequestWriterPageState extends State<RequestWriterPage> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: _isLoading
-                      ? null
-                      : () async {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              _isLoading = true;
-                            });
-                            try {
-                              final response = await request.post(
-                                "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/api/request-writer-role/",
-                                {'reason': _reason},
-                              );
+                  onPressed: _isLoading 
+                    ? null 
+                    : () async {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() { _isLoading = true; });
+                        try {
+                          final response = await request.post(
+                            "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/users/api/request-writer-role/",
+                            {
+                              'reason': _reason,
+                            },
+                          );
 
-                              if (!context.mounted) return;
+                          if (!context.mounted) return;
 
-                              if (response['status'] == 'success') {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(response['message']),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                                await Future.delayed(
-                                  const Duration(seconds: 2),
-                                );
-
-                                if (!context.mounted) return;
-                                Navigator.pop(context);
-                              } else {
-                                String errMessage =
-                                    response['message'] ??
-                                    "There was an error.";
-                                if (response['errors'] != null) {
-                                  errMessage = "Invalid request.";
-                                }
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(errMessage),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Error: $e"),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            } finally {
-                              if (mounted)
-                                setState(() {
-                                  _isLoading = false;
-                                });
+                          if (response['status'] == 'success') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(response['message']),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            await Future.delayed(const Duration(seconds: 2));
+          
+                            if (!context.mounted) return;
+                            Navigator.pop(context);
+                          } else {
+                            String errMessage = response['message'] ?? "There was an error.";
+                            if (response['errors'] != null) {
+                               errMessage = "Invalid request.";
                             }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(errMessage),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
                           }
-                        },
-                  child: _isLoading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text(
-                          "Send Request",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                             SnackBar(
+                              content: Text("Error: $e"),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() { _isLoading = false; });
+                        }
+                      }
+                  },
+                  child: _isLoading 
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Text(
+                        "Send Request",
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                 ),
               ),
             ],

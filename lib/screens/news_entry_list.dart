@@ -225,14 +225,15 @@ class _NewsEntryListPageState extends State<NewsEntryListPage> {
                     itemBuilder: (context, index) {
                       return NewsEntryCard(
                         news: news[index],
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          await Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                   NewsDetailPage(news: news[index]),
                             ),
                           );
+                          setState(() {});
                         },
                       );
                     },

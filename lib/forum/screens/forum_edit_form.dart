@@ -45,9 +45,7 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       insetPadding: const EdgeInsets.all(20),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 600,
-        ), // Batasi lebar agar mirip web
+        constraints: const BoxConstraints(maxWidth: 600),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Form(
@@ -56,20 +54,18 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Title
                 const Center(
                   child: Text(
                     'Edit Discussion',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87, // Abu gelap
+                      color: Colors.black87,
                     ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
-                // Title Input
                 _buildLabel("Title"),
                 TextFormField(
                   initialValue: _title,
@@ -80,7 +76,6 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Category Dropdown
                 _buildLabel("Category"),
                 DropdownButtonFormField<String>(
                   decoration: _inputDecoration(),
@@ -99,7 +94,6 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
                 ),
                 const SizedBox(height: 16),
 
-                // Description Input
                 _buildLabel("Description"),
                 TextFormField(
                   initialValue: _content,
@@ -111,7 +105,6 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
                 ),
                 const SizedBox(height: 32),
 
-                // Action Buttons (Save & Cancel)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -139,7 +132,7 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
                           );
                           if (context.mounted &&
                               response['status'] == 'success') {
-                            Navigator.pop(context, true); // Kirim sinyal sukses
+                            Navigator.pop(context, true);
                           }
                         }
                       },
@@ -203,10 +196,7 @@ class _ForumEditDialogState extends State<ForumEditDialog> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(6),
-        borderSide: const BorderSide(
-          color: Colors.red,
-          width: 1.5,
-        ), // Merah saat fokus
+        borderSide: const BorderSide(color: Colors.red, width: 1.5),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       isDense: true,

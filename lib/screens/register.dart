@@ -15,6 +15,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +112,60 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Column(
                       children: [
                         TextField(
+                          controller: _firstNameController,
+                          decoration: InputDecoration(
+                            hintText: 'First name',
+                            prefixIcon: const Icon(
+                              Icons.badge_outlined,
+                              color: Color(0xFF9ca3af),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFf9fafb),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _lastNameController,
+                          decoration: InputDecoration(
+                            hintText: 'Last name',
+                            prefixIcon: const Icon(
+                              Icons.badge_outlined,
+                              color: Color(0xFF9ca3af),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFf9fafb),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFe5e7eb),
+                                width: 2,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFdc2626),
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextField(
                           controller: _usernameController,
                           decoration: InputDecoration(
                             hintText: 'Enter your username',
@@ -200,6 +256,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               String password1 = _passwordController.text;
                               String password2 =
                                   _confirmPasswordController.text;
+                              String firstName = _firstNameController.text;
+                              String lastName = _lastNameController.text;
 
                               final response = await request.postJson(
                                 "https://davin-fauzan-olr-gg.pbp.cs.ui.ac.id/auth/register/",
@@ -207,6 +265,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   "username": username,
                                   "password1": password1,
                                   "password2": password2,
+                                  "first_name": firstName,
+                                  "last_name": lastName,
                                 }),
                               );
 
